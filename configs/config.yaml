@@ -25,7 +25,7 @@ Redis:
 
 Database:
   Type: sqlite3 # mysql, postgres, sqlite3
-  Host: 127.0.0.1
+  Host: sqlite3.db
   Port: 3306
   DBName: formula_go
   Username: root # set your username

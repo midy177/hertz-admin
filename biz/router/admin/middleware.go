@@ -29,7 +29,7 @@ func _healthcheckMw() []app.HandlerFunc {
 	return nil
 }
 
-func _initdatabaseMw() []app.HandlerFunc {
+func _initDatabaseMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -47,7 +47,7 @@ func _adminMw() []app.HandlerFunc {
 		middleware.ForbidOperation(configs.Data())}
 }
 
-func _rolebyidMw() []app.HandlerFunc {
+func _roleByIdMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -87,12 +87,12 @@ func _detailMw() []app.HandlerFunc {
 	return nil
 }
 
-func _detailbydictionarynameMw() []app.HandlerFunc {
+func _detailByDictionaryNameMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _dictionarylistMw() []app.HandlerFunc {
+func _dictionaryListMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -102,12 +102,12 @@ func _detail0Mw() []app.HandlerFunc {
 	return nil
 }
 
-func _createdictionarydetailMw() []app.HandlerFunc {
+func _createDictionaryDetailMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updatedictionarydetailMw() []app.HandlerFunc {
+func _updateDictionaryDetailMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -117,12 +117,12 @@ func _dict0Mw() []app.HandlerFunc {
 	return nil
 }
 
-func _createdictionaryMw() []app.HandlerFunc {
+func _createDictionaryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updatedictionaryMw() []app.HandlerFunc {
+func _updateDictionaryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -132,12 +132,12 @@ func _logsMw() []app.HandlerFunc {
 	return nil
 }
 
-func _deletelogsMw() []app.HandlerFunc {
+func _deleteLogsMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _getlogslistMw() []app.HandlerFunc {
+func _getLogsListMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -147,7 +147,7 @@ func _menu0Mw() []app.HandlerFunc {
 	return nil
 }
 
-func _menulistMw() []app.HandlerFunc {
+func _menuListMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -157,12 +157,12 @@ func _paramMw() []app.HandlerFunc {
 	return nil
 }
 
-func _menuparamlistbymenuidMw() []app.HandlerFunc {
+func _menuParamListByMenuIdMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _menubyroleMw() []app.HandlerFunc {
+func _menuByRoleMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -172,12 +172,12 @@ func _param0Mw() []app.HandlerFunc {
 	return nil
 }
 
-func _createmenuparamMw() []app.HandlerFunc {
+func _createMenuParamMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updatemenuparamMw() []app.HandlerFunc {
+func _updateMenuParamMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -187,12 +187,12 @@ func _menu1Mw() []app.HandlerFunc {
 	return nil
 }
 
-func _createmenuMw() []app.HandlerFunc {
+func _createMenuMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updatemenuMw() []app.HandlerFunc {
+func _updateMenuMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -207,7 +207,7 @@ func _providerMw() []app.HandlerFunc {
 	return nil
 }
 
-func _getproviderlistMw() []app.HandlerFunc {
+func _getProviderListMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -217,12 +217,12 @@ func _provider0Mw() []app.HandlerFunc {
 	return nil
 }
 
-func _createproviderMw() []app.HandlerFunc {
+func _createProviderMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updateproviderMw() []app.HandlerFunc {
+func _updateProviderMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -232,17 +232,312 @@ func _roleMw() []app.HandlerFunc {
 	return nil
 }
 
-func _createroleMw() []app.HandlerFunc {
+func _createRoleMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updateroleMw() []app.HandlerFunc {
+func _updateRoleMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
 func _role0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _roleListMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateRoleStatusMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _tokenMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateTokenMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _token0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _tokenListMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateProfileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userProfileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateUserStatusMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _user0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _changePasswordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createUserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userinfoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userListMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userPermCodeMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateUserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _oauth0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _oauthCallbackMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _oauthLoginMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _structToProtoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteStructTagMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteApiMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _apiListMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createApiMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateApiMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createAuthorityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _apiAuthorityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateApiAuthorityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createMenuAuthorityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _MenuAuthorityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateMenuAuthorityMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteDictionaryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteDictionaryDetailMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteMenuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteMenuParamMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteProviderMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteRoleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteTokenMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteUserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletestructtagMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _initdatabaseMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _structtoprotoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteapiMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _apilistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletedictionaryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletedictionarydetailMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _detailbydictionarynameMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _dictionarylistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createdictionarydetailMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatedictionarydetailMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletemenuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _menulistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deletemenuparamMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _menuparamlistbymenuidMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _menubyroleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createmenuparamMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatemenuparamMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteroleMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -257,17 +552,12 @@ func _updaterolestatusMw() []app.HandlerFunc {
 	return nil
 }
 
-func _tokenMw() []app.HandlerFunc {
+func _rolebyidMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _updatetokenMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _token0Mw() []app.HandlerFunc {
+func _deletetokenMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -277,12 +567,7 @@ func _tokenlistMw() []app.HandlerFunc {
 	return nil
 }
 
-func _userMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _updateprofileMw() []app.HandlerFunc {
+func _deleteuserMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -292,77 +577,12 @@ func _userprofileMw() []app.HandlerFunc {
 	return nil
 }
 
+func _updateprofileMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _updateuserstatusMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _user0Mw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _changepasswordMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _createuserMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userinfoMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userlistMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _userpermcodeMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _updateuserMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _oauth0Mw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _oauthcallbackMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _oauthloginMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _structtoprotoMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _deletestructtagMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _deleteapiMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _apilistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -407,22 +627,32 @@ func _updatemenuauthorityMw() []app.HandlerFunc {
 	return nil
 }
 
-func _deletedictionaryMw() []app.HandlerFunc {
+func _createdictionaryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _deletedictionarydetailMw() []app.HandlerFunc {
+func _updatedictionaryMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _deletemenuMw() []app.HandlerFunc {
+func _deletelogsMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _deletemenuparamMw() []app.HandlerFunc {
+func _getlogslistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createmenuMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatemenuMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -432,17 +662,67 @@ func _deleteproviderMw() []app.HandlerFunc {
 	return nil
 }
 
-func _deleteroleMw() []app.HandlerFunc {
+func _getproviderlistMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _deletetokenMw() []app.HandlerFunc {
+func _createproviderMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
 
-func _deleteuserMw() []app.HandlerFunc {
+func _updateproviderMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createroleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateroleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatetokenMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _changepasswordMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _createuserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userpermcodeMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updateuserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _oauthcallbackMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _oauthloginMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

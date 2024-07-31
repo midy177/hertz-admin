@@ -8,7 +8,6 @@ package data
 
 import (
 	"fmt"
-
 	"formulago/configs"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"

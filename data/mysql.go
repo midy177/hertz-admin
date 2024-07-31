@@ -9,10 +9,9 @@ package data
 import (
 	"context"
 	"fmt"
+	"formulago/configs"
 	"os"
 	"time"
-
-	"formulago/configs"
 
 	"ariga.io/atlas/sql/migrate"
 

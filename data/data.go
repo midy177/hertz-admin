@@ -10,9 +10,9 @@ package data
 
 import (
 	"context"
+	"formulago/configs"
 	"time"
 
-	"formulago/configs"
 	"formulago/data/ent"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"

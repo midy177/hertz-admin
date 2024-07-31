@@ -9,15 +9,13 @@
 package configs
 
 import (
-	"embed"
-	"os"
-
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/jinzhu/configor"
+	"github.com/spf13/viper"
+	"os"
 )
 
-//go:embed *.yaml
-var configFiles embed.FS
+////go:embed *.yaml
+//var configFiles embed.FS
 
 // GlobalConfig .
 var globalConfig Config
@@ -25,13 +23,13 @@ var isInit = false
 
 func InitConfig() {
 	// log print embed config file
-	DirEntry, err := configFiles.ReadDir(".")
-	if err != nil {
-		hlog.Fatal("read config embed dir error: ", err)
-	}
-	for _, v := range DirEntry {
-		hlog.Info("embed config file: ", v.Name())
-	}
+	//DirEntry, err := configFiles.ReadDir(".")
+	//if err != nil {
+	//	hlog.Fatal("read config embed dir error: ", err)
+	//}
+	//for _, v := range DirEntry {
+	//	hlog.Info("embed config file: ", v.Name())
+	//}
 	// load config
 	globalConfig, _ = load()
 }
@@ -51,24 +49,31 @@ func ReLoad() {
 
 // load from config.yaml (embed)
 func load() (config Config, err error) {
+	configName := "config_dev"
 	// Obtain whether it is prod environment from the environment variable
 	IsProd := os.Getenv("IS_PROD")
 	// If it is prod environment, load the prod configuration file
 	if IsProd == "true" {
 		hlog.Info("load prod config")
-		err = configor.New(&configor.Config{ErrorOnUnmatchedKeys: true, FS: configFiles}).
-			Load(&config, "config.yaml")
-		if err != nil {
-			hlog.Fatal(err)
-		}
-		return
+		configName = "config"
+	} else {
+		hlog.Info("load dev config")
 	}
-	// If it is not prod environment, load the dev configuration file
-	hlog.Info("load dev config")
-	err = configor.New(&configor.Config{ErrorOnUnmatchedKeys: true, FS: configFiles}).
-		Load(&config, "config_dev.yaml")
+	// 设置配置文件名和路径
+	vip := viper.New()
+	vip.SetConfigName(configName)
+	vip.AddConfigPath(".")
+	vip.AddConfigPath("./configs")
+	vip.SetConfigType("yaml")
+
+	// 读取配置文件
+	err = vip.ReadInConfig()
 	if err != nil {
-		hlog.Fatal(err)
+		hlog.Fatalf("Failed to read config file: %s", err)
+	}
+	err = vip.Unmarshal(&config)
+	if err != nil {
+		hlog.Fatalf("Failed to unmarshal config file: %s", err)
 	}
 	return
 }
