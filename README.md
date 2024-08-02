@@ -1,4 +1,4 @@
-# FormulaGo
+# HertzAdmin
 [English](README_EN.md) | 中文
 
 ## 简介
@@ -9,14 +9,9 @@
 - 路由接口：参考[ Google 开放平台](https://github.com/googleapis/googleapis)，使用 Protobuf 定义接口规范。
 - 面向接口开发，更好拓展与单元测试。
 
-## 演示网站
-- 地址: [https://formulago.com](https://base.hcteam.vip)
-- 账号: admin/formulago
-- 前端项目地址: [https://formulago-ui.com](https://github.com/chenghonour/formulago-ui)
-
 ## 架构图
 `看起来像F1赛车吗?`
-![Go Backend Clean Architecture](./formulago.png)
+![Go Backend Clean Architecture](./hertz-admin.png)
 
 ## 依赖
 - 使用 `Hertz` 作为 HTTP 框架
@@ -47,9 +42,13 @@
 ```bash
 go install github.com/cloudwego/hertz/cmd/hz@latest
 ```
+thriftgo install.
+```bash
+GO111MODULE=on go install github.com/cloudwego/thriftgo@latest
+```
 - hz new: 新建一个 Hertz 项目
 ```bash
-hz new -I api -idl api/admin/admin.proto -model_dir api/model -module formulago --unset_omitempty
+hz new -I api -idl api/admin/admin.proto -model_dir api/model -module hertz-admin --unset_omitempty
 ```
 - hz update: 当你的IDL文件更新，使用该指令进行项目代码更新
 - api.proto 与 base.proto是不需要更新与生成的，因为它们是由导入它们的proto文件生成的
@@ -90,16 +89,16 @@ ent - 一个简单但功能强大的 Go 实体框架。
 
 ### 使用 Docker 启动 MySQL
 ```bash
-cd formulago && docker-compose up
+cd hertz-admin && docker-compose up
 ```
 
 ### 运行本项目
 ```
-cd formulago
-go build -o formulago &&./formulago
+cd hertz-admin
+go build -o hertz-admin &&./hertz-admin
 
 # 项目运行后，HTTP Get请求以下路由，将会初始化数据库表数据
-# 初始管理员账号: admin/formulago
+# 初始管理员账号: admin/hertz-admin
 @router yourHost/api/initDatabase [GET]
 enjoy it!
 ```

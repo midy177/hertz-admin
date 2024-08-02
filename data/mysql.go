@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -9,7 +9,7 @@ package data
 import (
 	"context"
 	"fmt"
-	"formulago/configs"
+	"hertz-admin/configs"
 	"os"
 	"time"
 
@@ -20,9 +20,9 @@ import (
 	"entgo.io/ent/dialect"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"formulago/data/ent"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	_ "github.com/go-sql-driver/mysql"
+	"hertz-admin/data/ent"
 )
 
 const (

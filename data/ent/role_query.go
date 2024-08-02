@@ -6,9 +6,9 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	"formulago/data/ent/menu"
-	"formulago/data/ent/predicate"
-	"formulago/data/ent/role"
+	"hertz-admin/data/ent/menu"
+	"hertz-admin/data/ent/predicate"
+	"hertz-admin/data/ent/role"
 	"math"
 
 	"entgo.io/ent/dialect/sql"

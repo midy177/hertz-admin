@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -9,10 +9,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"formulago/configs"
-	"formulago/data"
 	"github.com/cloudwego/hertz/pkg/app"
 	_ "github.com/mattn/go-sqlite3"
+	"hertz-admin/configs"
+	"hertz-admin/data"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 )

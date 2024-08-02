@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"formulago/data/ent"
+	"hertz-admin/data/ent"
 )
 
 // The APIFunc type is an adapter to allow the use of ordinary

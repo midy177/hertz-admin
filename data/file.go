@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -7,8 +7,8 @@
 package data
 
 import (
-	"formulago/configs"
-	"formulago/data/s3"
+	"hertz-admin/configs"
+	"hertz-admin/data/s3"
 )
 
 // fileStore offers file store interface

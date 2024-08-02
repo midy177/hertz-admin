@@ -2,8 +2,8 @@ package data
 
 import (
 	"fmt"
-	"formulago/configs"
-	"formulago/data/ent"
+	"hertz-admin/configs"
+	"hertz-admin/data/ent"
 )
 
 // NewClient returns a new ent client.

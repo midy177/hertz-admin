@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -8,13 +8,13 @@ package admin
 
 import (
 	"context"
-	"formulago/pkg/encrypt"
 	"github.com/casbin/casbin/v2"
+	"hertz-admin/pkg/encrypt"
 	"sync"
 
-	"formulago/data/ent"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cockroachdb/errors"
+	"hertz-admin/data/ent"
 )
 
 type InitDatabase struct {
@@ -103,7 +103,7 @@ func (I *InitDatabase) InitDatabase(ctx context.Context) error {
 // insert init user data
 func (I *InitDatabase) insertUserData(ctx context.Context) error {
 	var users []*ent.UserCreate
-	password, _ := encrypt.BcryptEncrypt("formulago")
+	password, _ := encrypt.BcryptEncrypt("hertz-admin")
 	users = append(users, I.DB.User.Create().
 		SetUsername("admin").
 		SetNickname("admin").
@@ -626,7 +626,7 @@ func (I *InitDatabase) insertMenuData(ctx context.Context) error {
 
 	menus[8] = I.DB.Menu.Create().
 		SetMenuLevel(2).
-		SetMenuType(2).
+		SetMenuType(1).
 		SetParentID(3).
 		SetPath("/sys/dictionary/detail").
 		SetName("Dictionary Detail").

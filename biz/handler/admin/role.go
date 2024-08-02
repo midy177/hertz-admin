@@ -4,15 +4,15 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	logic "formulago/biz/logic/admin"
-	"formulago/data"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/jinzhu/copier"
+	"hertz-admin/biz/domain"
+	logic "hertz-admin/biz/logic/admin"
+	"hertz-admin/data"
 
-	"formulago/api/model/admin"
-	base "formulago/api/model/base"
 	"github.com/cloudwego/hertz/pkg/app"
+	"hertz-admin/api/model/admin"
+	base "hertz-admin/api/model/base"
 )
 
 // CreateRole .
@@ -23,8 +23,8 @@ func CreateRole(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -38,14 +38,14 @@ func CreateRole(ctx context.Context, c *app.RequestContext) {
 		OrderNo:       req.OrderNo,
 	})
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -57,8 +57,8 @@ func UpdateRole(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -73,14 +73,14 @@ func UpdateRole(ctx context.Context, c *app.RequestContext) {
 		OrderNo:       req.OrderNo,
 	})
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -92,22 +92,22 @@ func DeleteRole(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	err = logic.NewRole(data.Default()).Delete(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -119,29 +119,29 @@ func RoleByID(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.RoleInfoResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	roleInfo, err := logic.NewRole(data.Default()).RoleInfoByID(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	err = copier.Copy(&resp, &roleInfo)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -153,8 +153,8 @@ func RoleList(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.RoleListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -164,24 +164,24 @@ func RoleList(ctx context.Context, c *app.RequestContext) {
 	listReq.PageSize = req.PageSize
 	list, total, err := logic.NewRole(data.Default()).List(ctx, &listReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	var infos []*admin.RoleInfo
 	err = copier.Copy(&infos, &list)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
 	resp.Data = infos
 	resp.Total = uint64(total)
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -193,21 +193,21 @@ func UpdateRoleStatus(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	err = logic.NewRole(data.Default()).UpdateStatus(ctx, req.ID, uint8(req.Status))
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -7,11 +7,11 @@
 package admin
 
 import (
-	"formulago/biz/domain"
-	"formulago/configs"
-	"formulago/data"
-	"formulago/pkg/captcha"
 	"github.com/mojocn/base64Captcha"
+	"hertz-admin/biz/domain"
+	"hertz-admin/configs"
+	"hertz-admin/data"
+	"hertz-admin/pkg/captcha"
 )
 
 var (

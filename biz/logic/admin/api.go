@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -10,11 +10,11 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	"formulago/data"
-	"formulago/data/ent/api"
-	"formulago/data/ent/predicate"
 	"github.com/cockroachdb/errors"
+	"hertz-admin/biz/domain"
+	"hertz-admin/data"
+	"hertz-admin/data/ent/api"
+	"hertz-admin/data/ent/predicate"
 )
 
 type Api struct {

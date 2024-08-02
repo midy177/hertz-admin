@@ -4,8 +4,8 @@ package ent
 
 import (
 	"fmt"
-	"formulago/data/ent/token"
-	"formulago/data/ent/user"
+	"hertz-admin/data/ent/token"
+	"hertz-admin/data/ent/user"
 	"strings"
 	"time"
 

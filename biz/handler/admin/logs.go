@@ -4,14 +4,14 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	logic "formulago/biz/logic/admin"
-	"formulago/data"
+	"hertz-admin/biz/domain"
+	logic "hertz-admin/biz/logic/admin"
+	"hertz-admin/data"
 
-	admin "formulago/api/model/admin"
-	base "formulago/api/model/base"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	admin "hertz-admin/api/model/admin"
+	base "hertz-admin/api/model/base"
 )
 
 // GetLogsList .
@@ -22,8 +22,8 @@ func GetLogsList(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.LogsListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -47,8 +47,8 @@ func GetLogsList(ctx context.Context, c *app.RequestContext) {
 	}
 	logsList, total, err := logic.NewLogs(data.Default()).List(ctx, &logsListReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -73,8 +73,8 @@ func GetLogsList(ctx context.Context, c *app.RequestContext) {
 
 	resp.Data = list
 	resp.Total = uint64(total)
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -90,7 +90,7 @@ func DeleteLogs(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(base.BaseResp)
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }

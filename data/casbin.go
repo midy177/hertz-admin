@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -8,11 +8,11 @@ package data
 
 import (
 	"fmt"
-	"formulago/configs"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	entAdapter "github.com/casbin/ent-adapter"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"hertz-admin/configs"
 )
 
 var casbinEnforcer *casbin.Enforcer

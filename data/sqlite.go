@@ -5,9 +5,9 @@ import (
 	"context"
 	"entgo.io/ent/dialect/sql/schema"
 	"fmt"
-	"formulago/configs"
-	"formulago/data/ent"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"hertz-admin/configs"
+	"hertz-admin/data/ent"
 	"log"
 	"os"
 )

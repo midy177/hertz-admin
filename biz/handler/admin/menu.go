@@ -4,16 +4,16 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	logic "formulago/biz/logic/admin"
-	"formulago/data"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/jinzhu/copier"
+	"hertz-admin/biz/domain"
+	logic "hertz-admin/biz/logic/admin"
+	"hertz-admin/data"
 	"strconv"
 
-	"formulago/api/model/admin"
-	base "formulago/api/model/base"
 	"github.com/cloudwego/hertz/pkg/app"
+	"hertz-admin/api/model/admin"
+	base "hertz-admin/api/model/base"
 )
 
 // CreateMenu .
@@ -24,8 +24,8 @@ func CreateMenu(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -33,22 +33,22 @@ func CreateMenu(ctx context.Context, c *app.RequestContext) {
 	var menuReq domain.MenuInfo
 	err = copier.Copy(&menuReq, &req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
 	err = logic.NewMenu(data.Default()).Create(ctx, &menuReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -60,8 +60,8 @@ func UpdateMenu(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -69,22 +69,22 @@ func UpdateMenu(ctx context.Context, c *app.RequestContext) {
 	var menuReq domain.MenuInfo
 	err = copier.Copy(&menuReq, &req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
 	err = logic.NewMenu(data.Default()).Update(ctx, &menuReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -96,22 +96,22 @@ func DeleteMenu(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	err = logic.NewMenu(data.Default()).Delete(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -123,8 +123,8 @@ func MenuByRole(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.MenuInfoListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -141,8 +141,8 @@ func MenuByRole(ctx context.Context, c *app.RequestContext) {
 	}
 	menuTree, total, err := logic.NewMenu(data.Default()).ListByRole(ctx, uint64(roleID))
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -150,15 +150,15 @@ func MenuByRole(ctx context.Context, c *app.RequestContext) {
 	var menuInfos []*admin.MenuInfo
 	err = copier.Copy(&menuInfos, &menuTree)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	resp.Data = menuInfos
 	resp.Total = total
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -170,8 +170,8 @@ func MenuList(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.MenuInfoListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -181,8 +181,8 @@ func MenuList(ctx context.Context, c *app.RequestContext) {
 	listReq.PageSize = req.PageSize
 	menuTree, total, err := logic.NewMenu(data.Default()).List(ctx, &listReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -190,15 +190,15 @@ func MenuList(ctx context.Context, c *app.RequestContext) {
 	var menuInfos []*admin.MenuInfo
 	err = copier.Copy(&menuInfos, &menuTree)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	resp.Data = menuInfos
 	resp.Total = uint64(total)
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -210,8 +210,8 @@ func CreateMenuParam(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -219,21 +219,21 @@ func CreateMenuParam(ctx context.Context, c *app.RequestContext) {
 	var menuParamReq domain.MenuParam
 	err = copier.Copy(&menuParamReq, &req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	err = logic.NewMenu(data.Default()).CreateMenuParam(ctx, &menuParamReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -245,8 +245,8 @@ func UpdateMenuParam(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -254,21 +254,21 @@ func UpdateMenuParam(ctx context.Context, c *app.RequestContext) {
 	var menuParamReq domain.MenuParam
 	err = copier.Copy(&menuParamReq, &req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	err = logic.NewMenu(data.Default()).UpdateMenuParam(ctx, &menuParamReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -280,22 +280,22 @@ func DeleteMenuParam(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	err = logic.NewMenu(data.Default()).DeleteMenuParam(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -307,31 +307,31 @@ func MenuParamListByMenuID(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.MenuParamListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	menuParams, total, err := logic.NewMenu(data.Default()).MenuParamListByMenuID(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	var menuParamInfos []*admin.MenuParamResp
 	err = copier.Copy(&menuParamInfos, &menuParams)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
 	resp.Data = menuParamInfos
 	resp.Total = total
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }

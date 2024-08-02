@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -17,14 +17,14 @@ message IDReq {
   uint64 ID = 1;
 }
 
-enum ErrCode {
+enum StatusCode {
   Success = 0;
   Fail = 1;
 }
 
 message BaseResp {
-  ErrCode errCode = 1;
-  string errMsg = 2;
+  StatusCode statusCode = 1;
+  string statusMsg = 2;
 }
 
 message PageInfoReq {

@@ -4,7 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"formulago/data/ent/oauthprovider"
+	"hertz-admin/data/ent/oauthprovider"
 	"strings"
 	"time"
 

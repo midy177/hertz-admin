@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -8,12 +8,12 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	"formulago/data"
-	"formulago/data/ent"
-	"formulago/data/ent/role"
-	"formulago/data/ent/user"
 	"github.com/cockroachdb/errors"
+	"hertz-admin/biz/domain"
+	"hertz-admin/data"
+	"hertz-admin/data/ent"
+	"hertz-admin/data/ent/role"
+	"hertz-admin/data/ent/user"
 	"strconv"
 	"time"
 )

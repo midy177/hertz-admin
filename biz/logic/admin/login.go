@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -8,17 +8,17 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	"formulago/data"
-	"formulago/pkg/encrypt"
+	"hertz-admin/biz/domain"
+	"hertz-admin/data"
+	"hertz-admin/pkg/encrypt"
 	"strconv"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cockroachdb/errors"
 
-	"formulago/data/ent"
-	"formulago/data/ent/user"
+	"hertz-admin/data/ent"
+	"hertz-admin/data/ent/user"
 )
 
 type Login struct {

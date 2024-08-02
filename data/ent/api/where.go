@@ -3,7 +3,7 @@
 package api
 
 import (
-	"formulago/data/ent/predicate"
+	"hertz-admin/data/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

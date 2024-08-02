@@ -3,17 +3,17 @@
 package ent
 
 import (
-	"formulago/data/ent/api"
-	"formulago/data/ent/dictionary"
-	"formulago/data/ent/dictionarydetail"
-	"formulago/data/ent/logs"
-	"formulago/data/ent/menu"
-	"formulago/data/ent/menuparam"
-	"formulago/data/ent/oauthprovider"
-	"formulago/data/ent/role"
-	"formulago/data/ent/schema"
-	"formulago/data/ent/token"
-	"formulago/data/ent/user"
+	"hertz-admin/data/ent/api"
+	"hertz-admin/data/ent/dictionary"
+	"hertz-admin/data/ent/dictionarydetail"
+	"hertz-admin/data/ent/logs"
+	"hertz-admin/data/ent/menu"
+	"hertz-admin/data/ent/menuparam"
+	"hertz-admin/data/ent/oauthprovider"
+	"hertz-admin/data/ent/role"
+	"hertz-admin/data/ent/schema"
+	"hertz-admin/data/ent/token"
+	"hertz-admin/data/ent/user"
 	"time"
 )
 

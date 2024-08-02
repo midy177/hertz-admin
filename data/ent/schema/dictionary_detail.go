@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 
-	"formulago/data/ent/schema/mixins"
+	"hertz-admin/data/ent/schema/mixins"
 )
 
 type DictionaryDetail struct {

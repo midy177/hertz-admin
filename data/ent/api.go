@@ -4,7 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"formulago/data/ent/api"
+	"hertz-admin/data/ent/api"
 	"strings"
 	"time"
 

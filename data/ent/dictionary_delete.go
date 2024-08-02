@@ -4,8 +4,8 @@ package ent
 
 import (
 	"context"
-	"formulago/data/ent/dictionary"
-	"formulago/data/ent/predicate"
+	"hertz-admin/data/ent/dictionary"
+	"hertz-admin/data/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

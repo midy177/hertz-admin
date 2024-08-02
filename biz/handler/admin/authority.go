@@ -4,16 +4,16 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	logic "formulago/biz/logic/admin"
-	"formulago/data"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/jinzhu/copier"
+	"hertz-admin/biz/domain"
+	logic "hertz-admin/biz/logic/admin"
+	"hertz-admin/data"
 	"strconv"
 
-	"formulago/api/model/admin"
-	base "formulago/api/model/base"
 	"github.com/cloudwego/hertz/pkg/app"
+	"hertz-admin/api/model/admin"
+	base "hertz-admin/api/model/base"
 )
 
 // CreateAuthority .
@@ -24,8 +24,8 @@ func CreateAuthority(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -33,21 +33,21 @@ func CreateAuthority(ctx context.Context, c *app.RequestContext) {
 	var apiInfos []*domain.ApiAuthorityInfo
 	err = copier.Copy(&apiInfos, &req.Data)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
 	err = logic.NewAuthority(data.Default(), data.CasbinEnforcer()).UpdateApiAuthority(ctx, strconv.Itoa(int(req.RoleID)), apiInfos)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -59,8 +59,8 @@ func UpdateApiAuthority(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -68,21 +68,21 @@ func UpdateApiAuthority(ctx context.Context, c *app.RequestContext) {
 	var apiInfos []*domain.ApiAuthorityInfo
 	err = copier.Copy(&apiInfos, &req.Data)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
 	err = logic.NewAuthority(data.Default(), data.CasbinEnforcer()).UpdateApiAuthority(ctx, strconv.Itoa(int(req.RoleID)), apiInfos)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -95,16 +95,16 @@ func ApiAuthority(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.ApiAuthorityListInfoResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	policies, err := logic.NewAuthority(data.Default(), data.CasbinEnforcer()).ApiAuthority(ctx, strconv.Itoa(int(req.ID)))
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -116,8 +116,8 @@ func ApiAuthority(ctx context.Context, c *app.RequestContext) {
 			Method: v.Method,
 		})
 	}
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -129,22 +129,22 @@ func CreateMenuAuthority(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	err = logic.NewAuthority(data.Default(), data.CasbinEnforcer()).UpdateMenuAuthority(ctx, req.RoleID, req.MenuIDs)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -157,22 +157,22 @@ func UpdateMenuAuthority(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	err = logic.NewAuthority(data.Default(), data.CasbinEnforcer()).UpdateMenuAuthority(ctx, req.RoleID, req.MenuIDs)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -185,23 +185,23 @@ func MenuAuthority(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.MenuAuthorityInfoResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	menuIDs, err := logic.NewAuthority(data.Default(), data.CasbinEnforcer()).MenuAuthority(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	resp.RoleID = req.ID
 	resp.MenuIDs = menuIDs
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 
 	c.JSON(consts.StatusOK, resp)
 }

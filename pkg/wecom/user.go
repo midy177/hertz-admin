@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -10,11 +10,11 @@ package wecom
 
 import (
 	"context"
-	"formulago/configs"
 	"github.com/chenghonour/wechat-sdk"
 	"github.com/chenghonour/wechat-sdk/corp"
 	"github.com/chenghonour/wechat-sdk/corp/addrbook"
 	"github.com/cockroachdb/errors"
+	"hertz-admin/configs"
 )
 
 // GetUserIDByPhone get user id from wecom by phone

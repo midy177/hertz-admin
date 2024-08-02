@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -8,12 +8,12 @@ package middleware
 
 import (
 	"context"
-	"formulago/biz/domain"
-	"formulago/biz/logic/admin"
-	"formulago/data"
-	"formulago/pkg/types"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"hertz-admin/biz/domain"
+	"hertz-admin/biz/logic/admin"
+	"hertz-admin/data"
+	"hertz-admin/pkg/types"
 	"strconv"
 	"time"
 )

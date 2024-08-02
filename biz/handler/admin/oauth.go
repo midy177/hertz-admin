@@ -4,18 +4,18 @@ package admin
 
 import (
 	"context"
-	"formulago/biz/domain"
-	"formulago/biz/handler/middleware"
-	logic "formulago/biz/logic/admin"
-	"formulago/configs"
-	"formulago/data"
 	"github.com/jinzhu/copier"
+	"hertz-admin/biz/domain"
+	"hertz-admin/biz/handler/middleware"
+	logic "hertz-admin/biz/logic/admin"
+	"hertz-admin/configs"
+	"hertz-admin/data"
 	"strings"
 
-	admin "formulago/api/model/admin"
-	base "formulago/api/model/base"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	admin "hertz-admin/api/model/admin"
+	base "hertz-admin/api/model/base"
 )
 
 // CreateProvider .
@@ -26,8 +26,8 @@ func CreateProvider(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -35,21 +35,21 @@ func CreateProvider(ctx context.Context, c *app.RequestContext) {
 	var providerInfo domain.ProviderInfo
 	err = copier.Copy(&providerInfo, &req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 	err = logic.NewOauth(data.Default(), configs.Data()).Create(ctx, &providerInfo)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -61,8 +61,8 @@ func UpdateProvider(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -70,20 +70,20 @@ func UpdateProvider(ctx context.Context, c *app.RequestContext) {
 	var providerInfo domain.ProviderInfo
 	err = copier.Copy(&providerInfo, &req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 	}
 	err = logic.NewOauth(data.Default(), configs.Data()).Update(ctx, &providerInfo)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -95,20 +95,20 @@ func DeleteProvider(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		return
 	}
 
 	err = logic.NewOauth(data.Default(), configs.Data()).Delete(ctx, req.ID)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -120,8 +120,8 @@ func GetProviderList(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.ProviderListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -132,8 +132,8 @@ func GetProviderList(ctx context.Context, c *app.RequestContext) {
 	ListReq.Name = req.Name
 	l, total, err := logic.NewOauth(data.Default(), configs.Data()).List(ctx, &ListReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
@@ -141,15 +141,15 @@ func GetProviderList(ctx context.Context, c *app.RequestContext) {
 	var list []*admin.ProviderInfo
 	err = copier.Copy(&list, &l)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 	}
 
 	resp.Data = list
 	resp.Total = uint64(total)
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -161,8 +161,8 @@ func OauthLogin(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.OauthRedirectResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		return
 	}
 
@@ -171,14 +171,16 @@ func OauthLogin(ctx context.Context, c *app.RequestContext) {
 	loginReq.State = req.State
 	url, err := logic.NewOauth(data.Default(), configs.Data()).Login(ctx, &loginReq)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		return
 	}
 
-	resp.Url = url
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.Data = &admin.OauthRedirectInfo{
+		Url: url,
+	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 

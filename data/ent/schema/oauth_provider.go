@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 
-	"formulago/data/ent/schema/mixins"
+	"hertz-admin/data/ent/schema/mixins"
 )
 
 type OauthProvider struct {

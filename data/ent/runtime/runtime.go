@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in formulago/data/ent/runtime.go
+// The schema-stitching logic is generated in hertz-admin/data/ent/runtime.go
 
 const (
 	Version = "v0.11.5-0.20221226145649-c868f4a174d0"           // Version of ent codegen.

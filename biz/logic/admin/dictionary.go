@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -9,13 +9,13 @@ package admin
 import (
 	"context"
 	"fmt"
-	"formulago/biz/domain"
-	"formulago/data"
-	"formulago/data/ent"
-	"formulago/data/ent/dictionary"
-	"formulago/data/ent/dictionarydetail"
-	"formulago/data/ent/predicate"
 	"github.com/cockroachdb/errors"
+	"hertz-admin/biz/domain"
+	"hertz-admin/data"
+	"hertz-admin/data/ent"
+	"hertz-admin/data/ent/dictionary"
+	"hertz-admin/data/ent/dictionarydetail"
+	"hertz-admin/data/ent/predicate"
 	"time"
 )
 

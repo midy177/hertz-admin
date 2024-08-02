@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -44,24 +44,28 @@ message StructReq {
 
 // The information of struct | struct类型数据
 message StructResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   string structStr = 3;
 }
 
 // The information of proto | proto类型数据
 message ProtoResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   string protoStr = 3;
 }
 
 // The information of captcha | 验证码数据
 message CaptchaInfoResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
-  string captchaID = 3;
-  string imgPath = 4;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
+  CaptchaInfo data = 3;
+}
+
+message CaptchaInfo {
+  string captchaID = 1;
+  string imgPath = 2;
 }
 
 // casbin
@@ -158,8 +162,8 @@ message LoginResp {
 
 // The profile in response data | 返回个人数据
 message ProfileResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   string nickname = 3;
   string avatar = 4;
   string mobile = 5;
@@ -205,8 +209,8 @@ message CreateOrUpdateUserReq {
 
 // The response data of user's information | 用户信息返回数据
 message UserInfoResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 ID = 3;
   string avatar = 4;
   uint64 roleID = 5;
@@ -224,8 +228,8 @@ message UserInfoResp {
 
 // The response data of user list | 用户列表数据
 message UserListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated UserInfoResp data = 4;
 }
@@ -243,8 +247,8 @@ message UserListReq {
 
 // The permission code for front end permission control | 权限码： 用于前端权限控制
 message PermCodeResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   repeated string data = 3;
 }
 
@@ -282,8 +286,8 @@ message ApiInfo {
 
 // The response data of API list | API列表数据
 message ApiListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated ApiInfo data = 4;
 }
@@ -341,8 +345,8 @@ message CreateOrUpdateApiAuthorityReq {
 
 // The  data of api authorization list | API授权列表数据
 message ApiAuthorityListInfoResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated ApiAuthorityInfo data = 4;
 }
@@ -355,8 +359,8 @@ message MenuAuthorityInfoReq {
 
 // The response data of menu authorization | 菜单授权数据
 message MenuAuthorityInfoResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 roleID = 3;
   repeated uint64 MenuIDs = 4;
 }
@@ -455,8 +459,8 @@ message Meta {
 
 // The data of menu list | 菜单列表数据
 message MenuInfoListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated MenuInfo data = 4;
 }
@@ -486,8 +490,8 @@ message CreateOrUpdateMenuParamReq {
 
 // The response data of menu parameters  | 菜单参数返回数据
 message MenuParamResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 ID = 3;
   string type = 4;
   string key = 5;
@@ -498,8 +502,8 @@ message MenuParamResp {
 
 // The  data of menu parameters list | 菜单参数列表数据
 message MenuParamListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated MenuParamResp data = 4;
 }
@@ -549,8 +553,8 @@ message RoleInfo {
 
 // The response data of role info | 角色信息返回数据
 message RoleInfoResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 ID = 3;
   string name = 4;
   string value = 5;
@@ -564,8 +568,8 @@ message RoleInfoResp {
 
 // Get role list response | 获取角色列表响应
 message RoleListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated RoleInfo data = 4;
 }
@@ -600,8 +604,8 @@ message TokenInfo {
 
 // The response data of Token list | Token列表返回数据
 message TokenListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated TokenInfo data = 4;
 }
@@ -670,8 +674,8 @@ message DictionaryInfo {
 
 // The data of dictionary list | 字典列表数据
 message DictionaryListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated DictionaryInfo data = 4;
 }
@@ -690,8 +694,8 @@ message DictionaryDetail {
 
 // The response data of dictionary KV information list | 字典键值列表数据
 message DictionaryDetailListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated DictionaryDetail data = 4;
 }
@@ -748,9 +752,13 @@ message OauthLoginReq {
 
 // Redirect information | 跳转网址
 message OauthRedirectResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
-  string url = 3;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
+  OauthRedirectInfo data = 3;
+}
+
+message OauthRedirectInfo {
+  string url = 1;
 }
 
 // The response data of oauth provider information | 提供者信息
@@ -777,8 +785,8 @@ message ProviderListReq {
 
 // The response data of provider list | 提供商列表返回数据
 message ProviderListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated ProviderInfo data = 4;
 }
@@ -832,8 +840,8 @@ message LogsListReq {
 
 // The response data of logs list | 日志列表返回数据
 message LogsListResp {
-  base.ErrCode errCode = 1;
-  string errMsg = 2;
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
   uint64 total = 3;
   repeated LogsInfo data = 4;
 }

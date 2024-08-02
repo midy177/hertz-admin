@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"formulago/data/ent/logs"
+	"hertz-admin/data/ent/logs"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"

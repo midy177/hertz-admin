@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -9,15 +9,15 @@ package admin
 import (
 	"context"
 	"fmt"
-	"formulago/biz/domain"
-	"formulago/configs"
-	"formulago/data"
-	"formulago/data/ent/oauthprovider"
-	"formulago/data/ent/predicate"
-	"formulago/pkg/wecom"
 	"github.com/cloudwego/hertz/pkg/common/json"
 	"github.com/cockroachdb/errors"
 	"golang.org/x/oauth2"
+	"hertz-admin/biz/domain"
+	"hertz-admin/configs"
+	"hertz-admin/data"
+	"hertz-admin/data/ent/oauthprovider"
+	"hertz-admin/data/ent/predicate"
+	"hertz-admin/pkg/wecom"
 	"io"
 	"net/http"
 	"strings"

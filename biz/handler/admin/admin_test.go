@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"testing"
 
-	"formulago/api/model/admin"
-	"formulago/api/model/base"
+	"hertz-admin/api/model/admin"
+	"hertz-admin/api/model/base"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/json"
@@ -23,7 +23,7 @@ func TestHealthCheck(t *testing.T) {
 		ut.Header{Key: "Content-Type", Value: "application/json"})
 	resp := w.Result()
 	assert.DeepEqual(t, 200, resp.StatusCode())
-	assert.DeepEqual(t, `{"errCode":0,"errMsg":"success"}`, string(resp.Body()))
+	assert.DeepEqual(t, `{"errCode":0,"StatusMsg":"success"}`, string(resp.Body()))
 }
 
 func TestCaptcha(t *testing.T) {
@@ -40,8 +40,8 @@ func TestCaptcha(t *testing.T) {
 		return
 	}
 	assert.DeepEqual(t, 200, resp.StatusCode())
-	assert.DeepEqual(t, base.ErrCode_Success, captchaInfoResp.ErrCode)
-	assert.DeepEqual(t, "success", captchaInfoResp.ErrMsg)
+	assert.DeepEqual(t, base.StatusCode_Success, captchaInfoResp.StatusCode)
+	assert.DeepEqual(t, "success", captchaInfoResp.StatusMsg)
 }
 
 func TestDeleteStructTag(t *testing.T) {

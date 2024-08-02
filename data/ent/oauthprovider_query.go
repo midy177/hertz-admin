@@ -5,8 +5,8 @@ package ent
 import (
 	"context"
 	"fmt"
-	"formulago/data/ent/oauthprovider"
-	"formulago/data/ent/predicate"
+	"hertz-admin/data/ent/oauthprovider"
+	"hertz-admin/data/ent/predicate"
 	"math"
 
 	"entgo.io/ent/dialect/sql"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -9,10 +9,10 @@ package s3
 import (
 	"context"
 	"fmt"
-	"formulago/configs"
-	"formulago/pkg/img"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/cockroachdb/errors"
+	"hertz-admin/configs"
+	"hertz-admin/pkg/img"
 	"io"
 	"path/filepath"
 	"strings"

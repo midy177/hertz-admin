@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -10,13 +10,13 @@ package middleware
 
 import (
 	"context"
-	"formulago/configs"
+	"hertz-admin/configs"
 	"strconv"
 	"time"
 
-	"formulago/biz/domain"
-	logic "formulago/biz/logic/admin"
-	Data "formulago/data"
+	"hertz-admin/biz/domain"
+	logic "hertz-admin/biz/logic/admin"
+	Data "hertz-admin/data"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -51,7 +51,7 @@ func GetJWTMiddleware(c configs.Config, d *Data.Data, e *casbin.Enforcer) *jwt.H
 func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jwtMiddleware *jwt.HertzJWTMiddleware, err error) {
 	// the jwt middleware
 	jwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
-		Realm:       "formulago",
+		Realm:       "hertz-admin",
 		Key:         []byte(config.Auth.AccessSecret),
 		Timeout:     time.Duration(config.Auth.AccessExpire) * time.Second,
 		MaxRefresh:  time.Hour,

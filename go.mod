@@ -1,4 +1,4 @@
-module formulago
+module hertz-admin
 
 go 1.22.5
 

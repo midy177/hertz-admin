@@ -6,9 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"formulago/data/ent/predicate"
-	"formulago/data/ent/token"
-	"formulago/data/ent/user"
+	"hertz-admin/data/ent/predicate"
+	"hertz-admin/data/ent/token"
+	"hertz-admin/data/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

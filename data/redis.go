@@ -8,8 +8,8 @@ package data
 
 import (
 	"fmt"
-	"formulago/configs"
 	"github.com/redis/go-redis/v9"
+	"hertz-admin/configs"
 )
 
 // Official tutorial  https://redis.uptrace.dev/

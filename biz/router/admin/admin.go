@@ -3,8 +3,8 @@
 package admin
 
 import (
-	admin "formulago/biz/handler/admin"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	admin "hertz-admin/biz/handler/admin"
 )
 
 /*

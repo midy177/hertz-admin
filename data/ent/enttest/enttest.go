@@ -4,11 +4,11 @@ package enttest
 
 import (
 	"context"
-	"formulago/data/ent"
+	"hertz-admin/data/ent"
 	// required by schema hooks.
-	_ "formulago/data/ent/runtime"
+	_ "hertz-admin/data/ent/runtime"
 
-	"formulago/data/ent/migrate"
+	"hertz-admin/data/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

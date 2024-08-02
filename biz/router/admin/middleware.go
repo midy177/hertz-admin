@@ -3,10 +3,10 @@
 package admin
 
 import (
-	"formulago/biz/handler/middleware"
-	"formulago/configs"
-	"formulago/data"
 	"github.com/cloudwego/hertz/pkg/app"
+	"hertz-admin/biz/handler/middleware"
+	"hertz-admin/configs"
+	"hertz-admin/data"
 )
 
 func rootMw() []app.HandlerFunc {

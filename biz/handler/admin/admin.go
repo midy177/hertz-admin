@@ -9,10 +9,10 @@ import (
 	"regexp"
 	"strings"
 
-	"formulago/api/model/admin"
-	"formulago/api/model/base"
-	logic "formulago/biz/logic/admin"
-	"formulago/data"
+	"hertz-admin/api/model/admin"
+	"hertz-admin/api/model/base"
+	logic "hertz-admin/biz/logic/admin"
+	"hertz-admin/data"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -26,20 +26,20 @@ func InitDatabase(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 	err = logic.NewInitDatabase(data.Default().DBClient, data.CasbinEnforcer()).InitDatabase(ctx)
 	if err != nil {
-		resp.ErrCode = 1
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = 1
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -51,14 +51,14 @@ func HealthCheck(ctx context.Context, c *app.RequestContext) {
 	resp := new(base.BaseResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -70,19 +70,20 @@ func Captcha(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.CaptchaInfoResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
 
 	// GetCaptcha
 	id, b64s, err := logic.NewCaptcha().GetCaptcha()
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
-	resp.CaptchaID = id
-	resp.ImgPath = b64s
-
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	resp.Data = &admin.CaptchaInfo{
+		CaptchaID: id,
+		ImgPath:   b64s,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -94,8 +95,8 @@ func DeleteStructTag(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.StructResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -132,8 +133,8 @@ func DeleteStructTag(ctx context.Context, c *app.RequestContext) {
 	// end struct message line
 	sBuilder.WriteString("}\n")
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	resp.StructStr = sBuilder.String()
 
 	c.JSON(consts.StatusOK, resp)
@@ -147,8 +148,8 @@ func StructToProto(ctx context.Context, c *app.RequestContext) {
 	resp := new(admin.ProtoResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		resp.ErrCode = base.ErrCode_Fail
-		resp.ErrMsg = err.Error()
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
@@ -191,8 +192,8 @@ func StructToProto(ctx context.Context, c *app.RequestContext) {
 	// end proto message line
 	sBuilder.WriteString("}\n")
 
-	resp.ErrCode = base.ErrCode_Success
-	resp.ErrMsg = "success"
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	resp.ProtoStr = sBuilder.String()
 
 	c.JSON(consts.StatusOK, resp)

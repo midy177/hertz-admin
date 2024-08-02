@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -10,10 +10,11 @@ package data
 
 import (
 	"context"
-	"formulago/configs"
+	"errors"
+	"hertz-admin/configs"
 	"time"
 
-	"formulago/data/ent"
+	"hertz-admin/data/ent"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/patrickmn/go-cache"
@@ -89,10 +90,10 @@ func (d *Data) CacheGet(ctx context.Context, k string) (v string, exist bool, er
 	if d.Redis != nil {
 		v, err = d.Redis.Get(ctx, k).Result()
 		// redis.Nil is returned when the key does not exist
-		if err != nil && err != redis.Nil {
+		if err != nil && !errors.Is(err, redis.Nil) {
 			return "", false, err
 		}
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return "", false, nil
 		}
 		return v, true, nil

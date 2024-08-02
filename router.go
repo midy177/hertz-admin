@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 FormulaGo Authors
+ * Copyright 2024 HertzAdmin Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  */
@@ -7,10 +7,10 @@
 package main
 
 import (
-	"formulago/biz/handler/middleware"
-	"formulago/configs"
-	"formulago/data"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"hertz-admin/biz/handler/middleware"
+	"hertz-admin/configs"
+	"hertz-admin/data"
 )
 
 // customizeRegister registers customize routers.
