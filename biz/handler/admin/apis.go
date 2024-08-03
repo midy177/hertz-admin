@@ -143,6 +143,12 @@ func ApiList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	resp.Data = &admin.ApiInfoList{
+		Total: uint64(total),
+		Data:  make([]*admin.ApiInfo, 0, len(list)),
+	}
 	for _, v := range list {
 		var ApiInfo admin.ApiInfo
 		err = copier.Copy(&ApiInfo, &v)
@@ -152,10 +158,7 @@ func ApiList(ctx context.Context, c *app.RequestContext) {
 			c.JSON(consts.StatusInternalServerError, resp)
 			return
 		}
-		resp.Data = append(resp.Data, &ApiInfo)
+		resp.Data.Data = append(resp.Data.Data, &ApiInfo)
 	}
-	resp.Total = uint64(total)
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }

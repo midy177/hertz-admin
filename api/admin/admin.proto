@@ -211,27 +211,35 @@ message CreateOrUpdateUserReq {
 message UserInfoResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 ID = 3;
-  string avatar = 4;
-  uint64 roleID = 5;
-  string mobile = 6;
-  string email = 7;
-  uint64 status = 8;
-  string username = 9;
-  string nickname = 10;
-  string roleName = 11;
-  string createdAt = 12;
-  string updatedAt = 13;
-  string roleValue = 14;
-  string sideMode = 15;
+  UserInfo data = 3;
+}
+
+message UserInfo {
+  uint64 ID = 1;
+  string avatar = 2;
+  uint64 roleID = 3;
+  string mobile = 4;
+  string email = 5;
+  uint64 status = 6;
+  string username = 7;
+  string nickname = 8;
+  string roleName = 9;
+  string createdAt = 10;
+  string updatedAt = 11;
+  string roleValue = 12;
+  string sideMode = 13;
+}
+
+message UserInfoList {
+  uint64 total = 1;
+  repeated UserInfo data = 2;
 }
 
 // The response data of user list | 用户列表数据
 message UserListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated UserInfoResp data = 4;
+  UserInfoList data = 3;
 }
 
 // Get user list request | 获取用户列表请求参数
@@ -284,12 +292,16 @@ message ApiInfo {
   string method = 7;
 }
 
+message ApiInfoList {
+  uint64 total = 1;
+  repeated ApiInfo data = 2;
+}
+
 // The response data of API list | API列表数据
 message ApiListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated ApiInfo data = 4;
+  ApiInfoList data = 3;
 }
 
 // The request data of API list | API列表请求数据
@@ -343,12 +355,16 @@ message CreateOrUpdateApiAuthorityReq {
   repeated ApiAuthorityInfo data = 2;
 }
 
+message ApiAuthorityListInfo {
+  uint64 total = 1;
+  repeated ApiAuthorityInfo data = 2;
+}
+
 // The  data of api authorization list | API授权列表数据
 message ApiAuthorityListInfoResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated ApiAuthorityInfo data = 4;
+  ApiAuthorityListInfo data = 3;
 }
 
 // The request data of menu authorization | 菜单授权请求数据
@@ -357,12 +373,16 @@ message MenuAuthorityInfoReq {
   repeated uint64 MenuIDs = 2;
 }
 
+message MenuAuthorityInfo {
+  uint64 roleID = 1;
+  repeated uint64 MenuIDs = 2;
+}
+
 // The response data of menu authorization | 菜单授权数据
 message MenuAuthorityInfoResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 roleID = 3;
-  repeated uint64 MenuIDs = 4;
+    MenuAuthorityInfo data = 3;
 }
 
 // menu service
@@ -422,6 +442,23 @@ message CreateOrUpdateMenuReq {
   Meta meta = 11;
 }
 
+// The meta data of menu | 菜单的meta数据
+message Meta {
+  string title = 1;
+  string icon = 2;
+  bool hideMenu = 3;
+  bool hideBreadcrumb = 4;
+  string currentActiveMenu = 5;
+  bool ignoreKeepAlive = 6;
+  bool hideTab = 7;
+  string frameSrc = 8;
+  bool carryParam = 9;
+  bool hideChildrenInMenu = 10;
+  bool affix = 11;
+  uint32 dynamicLevel = 12;
+  string realPath = 13;
+}
+
 // The response data of menu information | 菜单返回数据
 message MenuInfo {
   uint64 ID = 1;
@@ -440,29 +477,16 @@ message MenuInfo {
   Meta meta = 14;
 }
 
-// The meta data of menu | 菜单的meta数据
-message Meta {
-  string title = 1;
-  string icon = 2;
-  bool hideMenu = 3;
-  bool hideBreadcrumb = 4;
-  string currentActiveMenu = 5;
-  bool ignoreKeepAlive = 6;
-  bool hideTab = 7;
-  string frameSrc = 8;
-  bool carryParam = 9;
-  bool hideChildrenInMenu = 10;
-  bool affix = 11;
-  uint32 dynamicLevel = 12;
-  string realPath = 13;
+message MenuInfoList {
+  uint64 total = 1;
+  repeated MenuInfo data = 2;
 }
 
 // The data of menu list | 菜单列表数据
 message MenuInfoListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated MenuInfo data = 4;
+    MenuInfoList data = 3;
 }
 
 // The response data of role menu list data | 角色菜单列表数据
@@ -566,12 +590,16 @@ message RoleInfoResp {
   string updatedAt = 11;
 }
 
+message RoleInfoList {
+  uint64 total = 1;
+  repeated RoleInfo data = 2;
+}
+
 // Get role list response | 获取角色列表响应
 message RoleListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated RoleInfo data = 4;
+  RoleInfoList data = 3;
 }
 
 // Token service
@@ -672,12 +700,16 @@ message DictionaryInfo {
   string updatedAt = 7;
 }
 
+message DictionaryInfoList {
+  uint64 total = 1;
+  repeated DictionaryInfo data = 2;
+}
+
 // The data of dictionary list | 字典列表数据
 message DictionaryListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated DictionaryInfo data = 4;
+  DictionaryInfoList data = 3;
 }
 
 // The dictionary KV information | 字典键值信息
@@ -692,12 +724,16 @@ message DictionaryDetail {
   uint64 parentID = 8;
 }
 
+message DictionaryDetailList {
+  uint64 total = 1;
+  repeated DictionaryDetail data = 2;
+}
+
 // The response data of dictionary KV information list | 字典键值列表数据
 message DictionaryDetailListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated DictionaryDetail data = 4;
+    DictionaryDetailList data = 3;
 }
 
 // The request data of dictionary KV information | 字典名获取字典键值请求数据
@@ -761,6 +797,12 @@ message OauthRedirectInfo {
   string url = 1;
 }
 
+message ProviderListReq {
+  uint64 page = 1;
+  uint64 pageSize = 2;
+  string name = 3;
+}
+
 // The response data of oauth provider information | 提供者信息
 message ProviderInfo {
   uint64 id = 1;
@@ -777,18 +819,16 @@ message ProviderInfo {
   string  updatedAt = 12;
 }
 
-message ProviderListReq {
-  uint64 page = 1;
-  uint64 pageSize = 2;
-  string name = 3;
+message ProviderInfoList {
+  uint64 total = 1;
+  repeated ProviderInfo data = 2;
 }
 
 // The response data of provider list | 提供商列表返回数据
 message ProviderListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated ProviderInfo data = 4;
+  ProviderInfoList data = 3;
 }
 
 // Oauth login callback request | Oauth 登录回调请求
@@ -805,7 +845,7 @@ service logs {
   }
   // Delete logs | 删除日志信息
   rpc DeleteLogs (base.Empty) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/logs/deleteAll";
+    option (api.delete) = "/api/admin/logs/delete_all";
   }
 }
 

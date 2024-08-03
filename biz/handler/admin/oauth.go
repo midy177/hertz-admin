@@ -137,19 +137,18 @@ func GetProviderList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
-	var list []*admin.ProviderInfo
-	err = copier.Copy(&list, &l)
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	resp.Data = &admin.ProviderInfoList{
+		Total: uint64(total),
+		Data:  make([]*admin.ProviderInfo, 0, len(l)),
+	}
+	err = copier.Copy(&resp.Data.Data, &l)
 	if err != nil {
 		resp.StatusCode = base.StatusCode_Fail
 		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 	}
-
-	resp.Data = list
-	resp.Total = uint64(total)
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 

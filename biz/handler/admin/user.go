@@ -194,19 +194,21 @@ func UserInfo(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.ID = user.ID
-	resp.Username = user.Username
-	resp.Status = uint64(user.Status)
-	resp.Email = user.Email
-	resp.Mobile = user.Mobile
-	resp.RoleID = user.RoleID
-	resp.Avatar = user.Avatar
-	resp.Nickname = user.Nickname
-	resp.CreatedAt = user.CreatedAt.Format("2006-01-02 15:04:05")
-	resp.UpdatedAt = user.UpdatedAt.Format("2006-01-02 15:04:05")
-	resp.SideMode = user.SideMode
-	resp.RoleName = user.RoleName
-	resp.RoleValue = user.RoleValue
+	resp.Data = &admin.UserInfo{
+		ID:        user.ID,
+		Username:  user.Username,
+		Status:    uint64(user.Status),
+		Email:     user.Email,
+		Mobile:    user.Mobile,
+		RoleID:    user.RoleID,
+		Avatar:    user.Avatar,
+		Nickname:  user.Nickname,
+		CreatedAt: user.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: user.UpdatedAt.Format("2006-01-02 15:04:05"),
+		SideMode:  user.SideMode,
+		RoleName:  user.RoleName,
+		RoleValue: user.RoleValue,
+	}
 
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
@@ -242,8 +244,14 @@ func UserList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	resp.Data = &admin.UserInfoList{
+		Total: uint64(total),
+		Data:  make([]*admin.UserInfo, 0, len(userList)),
+	}
 	for _, v := range userList {
-		resp.Data = append(resp.Data, &admin.UserInfoResp{
+		resp.Data.Data = append(resp.Data.Data, &admin.UserInfo{
 			ID:        v.ID,
 			Avatar:    v.Avatar,
 			RoleID:    v.RoleID,
@@ -256,9 +264,6 @@ func UserList(ctx context.Context, c *app.RequestContext) {
 			UpdatedAt: v.UpdatedAt.Format("2006-01-02 15:04:05"),
 		})
 	}
-	resp.Total = uint64(total)
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 

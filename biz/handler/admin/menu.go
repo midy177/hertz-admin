@@ -155,10 +155,12 @@ func MenuByRole(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.Data = menuInfos
-	resp.Total = total
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
+	resp.Data = &admin.MenuInfoList{
+		Total: total,
+		Data:  menuInfos,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -195,10 +197,12 @@ func MenuList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.Data = menuInfos
-	resp.Total = uint64(total)
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
+	resp.Data = &admin.MenuInfoList{
+		Total: uint64(total),
+		Data:  menuInfos,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 

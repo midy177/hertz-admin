@@ -79,7 +79,7 @@ func GetLogsList(ctx context.Context, c *app.RequestContext) {
 }
 
 // DeleteLogs .
-// @router /api/admin/logs/deleteAll [DELETE]
+// @router /api/admin/logs/delete_all [DELETE]
 func DeleteLogs(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req base.Empty
@@ -88,7 +88,11 @@ func DeleteLogs(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	err = logic.NewLogs(data.Default()).DeleteAll(ctx)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
 	resp := new(base.BaseResp)
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"

@@ -177,11 +177,12 @@ func RoleList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
-	resp.Data = infos
-	resp.Total = uint64(total)
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
+	resp.Data = &admin.RoleInfoList{
+		Total: uint64(total),
+		Data:  infos,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 

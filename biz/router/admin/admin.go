@@ -93,7 +93,7 @@ func Register(r *server.Hertz) {
 			}
 			{
 				_logs := _admin.Group("/logs", _logsMw()...)
-				_logs.DELETE("/deleteAll", append(_deletelogsMw(), admin.DeleteLogs)...)
+				_logs.DELETE("/delete_all", append(_deletelogsMw(), admin.DeleteLogs)...)
 				_logs.GET("/list", append(_getlogslistMw(), admin.GetLogsList)...)
 			}
 			{

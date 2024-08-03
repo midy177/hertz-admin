@@ -142,9 +142,14 @@ func DictionaryList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	var dataList []*admin.DictionaryInfo
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	resp.Data = &admin.DictionaryInfoList{
+		Total: uint64(total),
+		Data:  make([]*admin.DictionaryInfo, 0, len(dictList)),
+	}
 	for _, dict := range dictList {
-		dataList = append(dataList, &admin.DictionaryInfo{
+		resp.Data.Data = append(resp.Data.Data, &admin.DictionaryInfo{
 			ID:          dict.ID,
 			Name:        dict.Name,
 			Title:       dict.Title,
@@ -154,11 +159,6 @@ func DictionaryList(ctx context.Context, c *app.RequestContext) {
 			UpdatedAt:   dict.UpdatedAt,
 		})
 	}
-
-	resp.Data = dataList
-	resp.Total = uint64(total)
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -282,9 +282,14 @@ func DetailByDictionaryName(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	var dataList []*admin.DictionaryDetail
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	resp.Data = &admin.DictionaryDetailList{
+		Total: total,
+		Data:  make([]*admin.DictionaryDetail, 0, len(dictDetailList)),
+	}
 	for _, dictDetail := range dictDetailList {
-		dataList = append(dataList, &admin.DictionaryDetail{
+		resp.Data.Data = append(resp.Data.Data, &admin.DictionaryDetail{
 			ID:        dictDetail.ID,
 			ParentID:  dictDetail.ParentID,
 			Title:     dictDetail.Title,
@@ -295,10 +300,5 @@ func DetailByDictionaryName(ctx context.Context, c *app.RequestContext) {
 			UpdatedAt: dictDetail.UpdatedAt,
 		})
 	}
-
-	resp.Data = dataList
-	resp.Total = total
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }

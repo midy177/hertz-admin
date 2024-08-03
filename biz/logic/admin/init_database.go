@@ -512,7 +512,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetMethod("GET")
 
 	apis[58] = I.DB.API.Create().
-		SetPath("/api/admin/logs/deleteAll").
+		SetPath("/api/admin/logs/delete_all").
 		SetDescription("apiDesc.deleteLogs").
 		SetAPIGroup("logs").
 		SetMethod("DELETE")

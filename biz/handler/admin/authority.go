@@ -108,14 +108,18 @@ func ApiAuthority(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
-	resp.Total = uint64(len(policies))
-	for _, v := range policies {
-		resp.Data = append(resp.Data, &admin.ApiAuthorityInfo{
-			Path:   v.Path,
-			Method: v.Method,
-		})
+	resp.Data = &admin.ApiAuthorityListInfo{
+		Total: uint64(len(policies)),
+		Data:  make([]*admin.ApiAuthorityInfo, 0, len(policies)),
 	}
+
+	err = copier.Copy(&resp.Data.Data, &policies)
+	if err != nil {
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusInternalServerError, resp)
+	}
+
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
@@ -198,8 +202,10 @@ func MenuAuthority(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.RoleID = req.ID
-	resp.MenuIDs = menuIDs
+	resp.Data = &admin.MenuAuthorityInfo{
+		RoleID:  req.ID,
+		MenuIDs: menuIDs,
+	}
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 
