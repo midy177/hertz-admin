@@ -153,11 +153,17 @@ message SimpleRole {
   string value = 2;
 }
 
-// The log in response data | 登录返回数据
-message LoginResp {
-  string code = 1;
+message LoginInfo {
+  uint64 code = 1;
   string token = 2;
   string expire = 3;
+}
+
+// The log in response data | 登录返回数据
+message LoginResp {
+  base.StatusCode statusCode = 1;
+  string statusMsg = 2;
+  LoginInfo data = 3;
 }
 
 // The profile in response data | 返回个人数据

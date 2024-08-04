@@ -10,6 +10,9 @@ package middleware
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"hertz-admin/api/model/admin"
+	"hertz-admin/api/model/base"
 	"hertz-admin/configs"
 	"strconv"
 	"time"
@@ -201,6 +204,46 @@ func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jw
 				"code":    code,
 				"message": message,
 			})
+		},
+		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
+			resp := new(admin.LoginResp)
+			resp.StatusCode = base.StatusCode_Success
+			resp.StatusMsg = "success"
+			resp.Data = &admin.LoginInfo{
+				Code:   uint64(code),
+				Token:  token,
+				Expire: expire.Format("2006-01-02 15:04:05"),
+			}
+			c.JSON(code, resp)
+		},
+		RefreshResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
+			resp := new(admin.LoginResp)
+			resp.StatusCode = base.StatusCode_Success
+			resp.StatusMsg = "success"
+			resp.Data = &admin.LoginInfo{
+				Code:   uint64(code),
+				Token:  token,
+				Expire: expire.Format("2006-01-02 15:04:05"),
+			}
+			c.JSON(code, resp)
+		},
+		LogoutResponse: func(ctx context.Context, c *app.RequestContext, code int) {
+			resp := new(admin.LoginResp)
+			if code == 200 {
+				resp.StatusCode = base.StatusCode_Success
+				resp.StatusMsg = "success"
+			} else {
+				resp.StatusCode = base.StatusCode_Fail
+				resp.StatusMsg = "fail"
+			}
+			c.JSON(code, resp)
+		},
+		HTTPStatusMessageFunc: func(e error, ctx context.Context, c *app.RequestContext) string {
+			resp := new(admin.LoginResp)
+			resp.StatusCode = base.StatusCode_Fail
+			resp.StatusMsg = e.Error()
+			c.JSON(consts.StatusInternalServerError, resp)
+			return e.Error()
 		},
 	})
 
