@@ -4,6 +4,7 @@ package admin
 
 import (
 	"context"
+	"github.com/jinzhu/copier"
 	"hertz-admin/biz/domain"
 	logic "hertz-admin/biz/logic/admin"
 	"hertz-admin/data"
@@ -52,29 +53,19 @@ func GetLogsList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
-	var list []*admin.LogsInfo
-	for _, v := range logsList {
-		var logsInfo admin.LogsInfo
-		logsInfo.Type = v.Type
-		logsInfo.Method = v.Method
-		logsInfo.Api = v.Api
-		logsInfo.Success = v.Success
-		logsInfo.ReqContent = v.ReqContent
-		logsInfo.RespContent = v.RespContent
-		logsInfo.Ip = v.Ip
-		logsInfo.UserAgent = v.UserAgent
-		logsInfo.Operator = v.Operator
-		logsInfo.Time = v.Time
-		logsInfo.CreatedAt = v.CreatedAt
-		logsInfo.UpdatedAt = v.UpdatedAt
-		list = append(list, &logsInfo)
-	}
-
-	resp.Data = list
-	resp.Total = uint64(total)
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
+	resp.Data = &admin.LogsInfoList{
+		Total: uint64(total),
+		Data:  make([]*admin.LogsInfo, 0, len(logsList)),
+	}
+	err = copier.Copy(&resp.Data.Data, &logsList)
+	if err != nil {
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 

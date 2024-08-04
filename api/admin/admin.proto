@@ -325,7 +325,7 @@ service authority {
     option (api.post) = "/api/admin/authority/api/update";
   }
   // Get role's API authorization list | 获取角色api权限列表
-  rpc ApiAuthority (base.IDReq) returns (ApiAuthorityListInfoResp) {
+  rpc ApiAuthority (base.IDReq) returns (ApiAuthorityInfoListResp) {
     option (api.post) = "/api/admin/authority/api/role";
   }
   // Create menu authorization information | 创建菜单权限
@@ -355,16 +355,16 @@ message CreateOrUpdateApiAuthorityReq {
   repeated ApiAuthorityInfo data = 2;
 }
 
-message ApiAuthorityListInfo {
+message ApiAuthorityInfoList {
   uint64 total = 1;
   repeated ApiAuthorityInfo data = 2;
 }
 
 // The  data of api authorization list | API授权列表数据
-message ApiAuthorityListInfoResp {
+message ApiAuthorityInfoListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  ApiAuthorityListInfo data = 3;
+  ApiAuthorityInfoList data = 3;
 }
 
 // The request data of menu authorization | 菜单授权请求数据
@@ -513,7 +513,7 @@ message CreateOrUpdateMenuParamReq {
 }
 
 // The response data of menu parameters  | 菜单参数返回数据
-message MenuParamResp {
+message MenuParam {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
   uint64 ID = 3;
@@ -524,12 +524,16 @@ message MenuParamResp {
   string updatedAt = 8;
 }
 
+message MenuParamList {
+  uint64 total = 1;
+  repeated MenuParam data = 2;
+}
+
 // The  data of menu parameters list | 菜单参数列表数据
 message MenuParamListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated MenuParamResp data = 4;
+  MenuParamList data = 3;
 }
 
 // role service
@@ -630,12 +634,16 @@ message TokenInfo {
   string expiredAt = 8;
 }
 
+message TokenInfoList {
+  uint64 total = 1;
+  repeated TokenInfo data = 2;
+}
+
 // The response data of Token list | Token列表返回数据
 message TokenListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated TokenInfo data = 4;
+  TokenInfoList data = 3;
 }
 
 // Get token list request params | token列表请求参数
@@ -851,6 +859,17 @@ service logs {
 
 // logs message
 
+// The request data of logs list | 日志列表请求数据
+message LogsListReq {
+  uint64 page = 1;
+  uint64 pageSize = 2;
+  string type = 3;
+  string method = 4;
+  string api = 5;
+  string success = 6;
+  string operator = 7;
+}
+
 // The response data of logs | 日志信息
 message LogsInfo {
   string type = 1;
@@ -867,21 +886,13 @@ message LogsInfo {
   string updatedAt = 12;
 }
 
-// The request data of logs list | 日志列表请求数据
-message LogsListReq {
-  uint64 page = 1;
-  uint64 pageSize = 2;
-  string type = 3;
-  string method = 4;
-  string api = 5;
-  string success = 6;
-  string operator = 7;
+message LogsInfoList {
+  uint64 total = 1;
+  repeated LogsInfo data = 2;
 }
-
 // The response data of logs list | 日志列表返回数据
 message LogsListResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  uint64 total = 3;
-  repeated LogsInfo data = 4;
+  LogsInfoList data = 3;
 }

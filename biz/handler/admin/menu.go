@@ -155,12 +155,12 @@ func MenuByRole(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	resp.Data = &admin.MenuInfoList{
 		Total: total,
 		Data:  menuInfos,
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -197,12 +197,12 @@ func MenuList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	resp.Data = &admin.MenuInfoList{
 		Total: uint64(total),
 		Data:  menuInfos,
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -324,17 +324,17 @@ func MenuParamListByMenuID(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	var menuParamInfos []*admin.MenuParamResp
-	err = copier.Copy(&menuParamInfos, &menuParams)
+	resp.Data = &admin.MenuParamList{
+		Total: total,
+		Data:  make([]*admin.MenuParam, 0, len(menuParams)),
+	}
+	err = copier.Copy(&resp.Data.Data, &menuParams)
 	if err != nil {
 		resp.StatusCode = base.StatusCode_Fail
 		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
-	resp.Data = menuParamInfos
-	resp.Total = total
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)

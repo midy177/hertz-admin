@@ -45,7 +45,6 @@ func CreateApi(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
@@ -81,7 +80,6 @@ func UpdateApi(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
@@ -108,7 +106,6 @@ func DeleteApi(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
@@ -143,22 +140,29 @@ func ApiList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	resp.Data = &admin.ApiInfoList{
 		Total: uint64(total),
 		Data:  make([]*admin.ApiInfo, 0, len(list)),
 	}
-	for _, v := range list {
-		var ApiInfo admin.ApiInfo
-		err = copier.Copy(&ApiInfo, &v)
-		if err != nil {
-			resp.StatusCode = base.StatusCode_Fail
-			resp.StatusMsg = err.Error()
-			c.JSON(consts.StatusInternalServerError, resp)
-			return
-		}
-		resp.Data.Data = append(resp.Data.Data, &ApiInfo)
+	err = copier.Copy(&resp.Data.Data, &list)
+	if err != nil {
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	//for _, v := range list {
+	//	var ApiInfo admin.ApiInfo
+	//	err = copier.Copy(&ApiInfo, &v)
+	//	if err != nil {
+	//		resp.StatusCode = base.StatusCode_Fail
+	//		resp.StatusMsg = err.Error()
+	//		c.JSON(consts.StatusInternalServerError, resp)
+	//		return
+	//	}
+	//	resp.Data.Data = append(resp.Data.Data, &ApiInfo)
+	//}
 	c.JSON(consts.StatusOK, resp)
 }

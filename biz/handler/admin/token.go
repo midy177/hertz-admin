@@ -107,17 +107,17 @@ func TokenList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	for _, token := range tokens {
-		var tokenInfo admin.TokenInfo
-		tokenInfo.ID = token.ID
-		tokenInfo.UserID = token.UserID
-		tokenInfo.UserName = token.UserName
-		tokenInfo.CreatedAt = token.CreatedAt
-		tokenInfo.UpdatedAt = token.UpdatedAt
-		tokenInfo.ExpiredAt = token.ExpiredAt
-		resp.Data = append(resp.Data, &tokenInfo)
+	resp.Data = &admin.TokenInfoList{
+		Total: uint64(total),
+		Data:  make([]*admin.TokenInfo, 0, len(tokens)),
 	}
-	resp.Total = uint64(total)
+	err = copier.Copy(&resp.Data.Data, &tokens)
+	if err != nil {
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
+	}
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)

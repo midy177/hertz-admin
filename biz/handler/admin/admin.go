@@ -78,12 +78,12 @@ func Captcha(ctx context.Context, c *app.RequestContext) {
 
 	// GetCaptcha
 	id, b64s, err := logic.NewCaptcha().GetCaptcha()
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	resp.Data = &admin.CaptchaInfo{
 		CaptchaID: id,
 		ImgPath:   b64s,
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
 }
 

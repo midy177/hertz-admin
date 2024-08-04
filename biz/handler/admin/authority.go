@@ -92,7 +92,7 @@ func UpdateApiAuthority(ctx context.Context, c *app.RequestContext) {
 func ApiAuthority(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req base.IDReq
-	resp := new(admin.ApiAuthorityListInfoResp)
+	resp := new(admin.ApiAuthorityInfoListResp)
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		resp.StatusCode = base.StatusCode_Fail
@@ -108,7 +108,7 @@ func ApiAuthority(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.Data = &admin.ApiAuthorityListInfo{
+	resp.Data = &admin.ApiAuthorityInfoList{
 		Total: uint64(len(policies)),
 		Data:  make([]*admin.ApiAuthorityInfo, 0, len(policies)),
 	}
@@ -118,6 +118,7 @@ func ApiAuthority(ctx context.Context, c *app.RequestContext) {
 		resp.StatusCode = base.StatusCode_Fail
 		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
+		return
 	}
 
 	resp.StatusCode = base.StatusCode_Success
@@ -146,10 +147,8 @@ func CreateMenuAuthority(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
-
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -174,10 +173,8 @@ func UpdateMenuAuthority(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
-
 	c.JSON(consts.StatusOK, resp)
 }
 

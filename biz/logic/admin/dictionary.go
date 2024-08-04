@@ -214,9 +214,13 @@ func (d *Dictionary) DeleteDetail(ctx context.Context, id uint64) error {
 }
 
 func (d *Dictionary) DetailListByDictName(ctx context.Context, dictName string) (list []*domain.DictionaryDetail, total uint64, err error) {
+	var predicates []predicate.DictionaryDetail
+	if dictName != "" {
+		predicates = append(predicates, dictionarydetail.HasDictionaryWith(dictionary.NameEQ(dictName)))
+	}
 	// query dictionary detail
 	details, err := d.Data.DBClient.DictionaryDetail.Query().
-		Where(dictionarydetail.HasDictionaryWith(dictionary.NameEQ(dictName))).
+		Where(predicates...).
 		// union query to get the fields of the associated table
 		WithDictionary(func(q *ent.DictionaryQuery) {
 			// get all fields default, or use q.Select() to get some fields

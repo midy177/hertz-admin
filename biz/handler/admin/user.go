@@ -386,7 +386,6 @@ func UpdateUserStatus(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusBadRequest, resp)
 		return
 	}
-
 	err = logic.NewUser(data.Default()).UpdateUserStatus(ctx, req.ID, req.Status)
 	if err != nil {
 		resp.StatusCode = base.StatusCode_Fail
@@ -394,7 +393,6 @@ func UpdateUserStatus(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)

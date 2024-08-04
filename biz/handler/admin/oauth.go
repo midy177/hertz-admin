@@ -73,6 +73,7 @@ func UpdateProvider(ctx context.Context, c *app.RequestContext) {
 		resp.StatusCode = base.StatusCode_Fail
 		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
+		return
 	}
 	err = logic.NewOauth(data.Default(), configs.Data()).Update(ctx, &providerInfo)
 	if err != nil {
@@ -148,6 +149,7 @@ func GetProviderList(ctx context.Context, c *app.RequestContext) {
 		resp.StatusCode = base.StatusCode_Fail
 		resp.StatusMsg = err.Error()
 		c.JSON(consts.StatusInternalServerError, resp)
+		return
 	}
 	c.JSON(consts.StatusOK, resp)
 }

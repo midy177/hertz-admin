@@ -79,7 +79,6 @@ func UpdateDictionary(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
@@ -106,7 +105,6 @@ func DeleteDictionary(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
 	c.JSON(consts.StatusOK, resp)
@@ -142,23 +140,30 @@ func DictionaryList(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.StatusCode = base.StatusCode_Success
-	resp.StatusMsg = "success"
 	resp.Data = &admin.DictionaryInfoList{
 		Total: uint64(total),
 		Data:  make([]*admin.DictionaryInfo, 0, len(dictList)),
 	}
-	for _, dict := range dictList {
-		resp.Data.Data = append(resp.Data.Data, &admin.DictionaryInfo{
-			ID:          dict.ID,
-			Name:        dict.Name,
-			Title:       dict.Title,
-			Status:      dict.Status,
-			Description: dict.Description,
-			CreatedAt:   dict.CreatedAt,
-			UpdatedAt:   dict.UpdatedAt,
-		})
+	err = copier.Copy(&resp.Data.Data, &dictList)
+	if err != nil {
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
 	}
+	resp.StatusCode = base.StatusCode_Success
+	resp.StatusMsg = "success"
+	//for _, dict := range dictList {
+	//	resp.Data.Data = append(resp.Data.Data, &admin.DictionaryInfo{
+	//		ID:          dict.ID,
+	//		Name:        dict.Name,
+	//		Title:       dict.Title,
+	//		Status:      dict.Status,
+	//		Description: dict.Description,
+	//		CreatedAt:   dict.CreatedAt,
+	//		UpdatedAt:   dict.UpdatedAt,
+	//	})
+	//}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -288,17 +293,24 @@ func DetailByDictionaryName(ctx context.Context, c *app.RequestContext) {
 		Total: total,
 		Data:  make([]*admin.DictionaryDetail, 0, len(dictDetailList)),
 	}
-	for _, dictDetail := range dictDetailList {
-		resp.Data.Data = append(resp.Data.Data, &admin.DictionaryDetail{
-			ID:        dictDetail.ID,
-			ParentID:  dictDetail.ParentID,
-			Title:     dictDetail.Title,
-			Status:    dictDetail.Status,
-			Key:       dictDetail.Key,
-			Value:     dictDetail.Value,
-			CreatedAt: dictDetail.CreatedAt,
-			UpdatedAt: dictDetail.UpdatedAt,
-		})
+	err = copier.Copy(&resp.Data.Data, &dictDetailList)
+	if err != nil {
+		resp.StatusCode = base.StatusCode_Fail
+		resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusInternalServerError, resp)
+		return
 	}
+	//for _, dictDetail := range dictDetailList {
+	//	resp.Data.Data = append(resp.Data.Data, &admin.DictionaryDetail{
+	//		ID:        dictDetail.ID,
+	//		ParentID:  dictDetail.ParentID,
+	//		Title:     dictDetail.Title,
+	//		Status:    dictDetail.Status,
+	//		Key:       dictDetail.Key,
+	//		Value:     dictDetail.Value,
+	//		CreatedAt: dictDetail.CreatedAt,
+	//		UpdatedAt: dictDetail.UpdatedAt,
+	//	})
+	//}
 	c.JSON(consts.StatusOK, resp)
 }
