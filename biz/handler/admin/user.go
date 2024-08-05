@@ -61,7 +61,7 @@ func UserPermCode(ctx context.Context, c *app.RequestContext) {
 }
 
 // ChangePassword .
-// @router /api/admin/user/change-password [POST]
+// @router /api/admin/user/password [POST]
 func ChangePassword(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req admin.ChangePasswordReq
@@ -363,10 +363,15 @@ func UserProfile(ctx context.Context, c *app.RequestContext) {
 		c.JSON(consts.StatusInternalServerError, resp)
 		return
 	}
-	resp.Mobile = user.Mobile
-	resp.Avatar = user.Avatar
-	resp.Nickname = user.Nickname
-	resp.Email = user.Email
+	resp.Data = &admin.ProfileInfo{
+		//ID:       user.ID,
+		Mobile: user.Mobile,
+		Email:  user.Email,
+		//Status:   uint64(user.Status),
+		//Username: user.Username,
+		Nickname: user.Nickname,
+		Avatar:   user.Avatar,
+	}
 
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"

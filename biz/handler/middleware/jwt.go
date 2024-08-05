@@ -10,7 +10,6 @@ package middleware
 
 import (
 	"context"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"hertz-admin/api/model/admin"
 	"hertz-admin/api/model/base"
 	"hertz-admin/configs"
@@ -200,19 +199,19 @@ func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jw
 			return pass
 		},
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
-			c.JSON(code, map[string]interface{}{
-				"code":    code,
-				"message": message,
-			})
+			resp := new(base.BaseResp)
+			resp.StatusCode = base.StatusCode_Fail
+			resp.StatusMsg = message
+			c.JSON(code, resp)
 		},
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
 			resp := new(admin.LoginResp)
 			resp.StatusCode = base.StatusCode_Success
 			resp.StatusMsg = "success"
 			resp.Data = &admin.LoginInfo{
-				Code:   uint64(code),
-				Token:  token,
-				Expire: expire.Format("2006-01-02 15:04:05"),
+				Code:      uint64(code),
+				Token:     token,
+				ExpiredAt: uint64(expire.Unix()),
 			}
 			c.JSON(code, resp)
 		},
@@ -221,14 +220,14 @@ func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jw
 			resp.StatusCode = base.StatusCode_Success
 			resp.StatusMsg = "success"
 			resp.Data = &admin.LoginInfo{
-				Code:   uint64(code),
-				Token:  token,
-				Expire: expire.Format("2006-01-02 15:04:05"),
+				Code:      uint64(code),
+				Token:     token,
+				ExpiredAt: uint64(expire.Unix()),
 			}
 			c.JSON(code, resp)
 		},
 		LogoutResponse: func(ctx context.Context, c *app.RequestContext, code int) {
-			resp := new(admin.LoginResp)
+			resp := new(base.BaseResp)
 			if code == 200 {
 				resp.StatusCode = base.StatusCode_Success
 				resp.StatusMsg = "success"
@@ -239,10 +238,6 @@ func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jw
 			c.JSON(code, resp)
 		},
 		HTTPStatusMessageFunc: func(e error, ctx context.Context, c *app.RequestContext) string {
-			resp := new(admin.LoginResp)
-			resp.StatusCode = base.StatusCode_Fail
-			resp.StatusMsg = e.Error()
-			c.JSON(consts.StatusInternalServerError, resp)
 			return e.Error()
 		},
 	})

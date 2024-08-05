@@ -123,10 +123,10 @@ func Register(r *server.Hertz) {
 			}
 			{
 				_user0 := _admin.Group("/user", _user0Mw()...)
-				_user0.POST("/change-password", append(_changepasswordMw(), admin.ChangePassword)...)
 				_user0.POST("/create", append(_createuserMw(), admin.CreateUser)...)
 				_user0.GET("/info", append(_userinfoMw(), admin.UserInfo)...)
 				_user0.GET("/list", append(_userlistMw(), admin.UserList)...)
+				_user0.PUT("/password", append(_changepasswordMw(), admin.ChangePassword)...)
 				_user0.GET("/perm", append(_userpermcodeMw(), admin.UserPermCode)...)
 				_user0.POST("/update", append(_updateuserMw(), admin.UpdateUser)...)
 			}

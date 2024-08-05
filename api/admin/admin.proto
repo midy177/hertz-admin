@@ -101,7 +101,7 @@ service user {
   }
   // Change Password | 修改密码
   rpc ChangePassword (ChangePasswordReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/user/change-password";
+    option (api.put) = "/api/admin/user/password";
   }
   // Create user's information | 新增用户
   rpc CreateUser (CreateOrUpdateUserReq) returns (base.BaseResp) {
@@ -156,7 +156,7 @@ message SimpleRole {
 message LoginInfo {
   uint64 code = 1;
   string token = 2;
-  string expire = 3;
+  uint64 expiredAt = 3;
 }
 
 // The log in response data | 登录返回数据
@@ -166,14 +166,17 @@ message LoginResp {
   LoginInfo data = 3;
 }
 
+message ProfileInfo {
+  string nickname = 1;
+  string avatar = 2;
+  string mobile = 3;
+  string email = 4;
+}
 // The profile in response data | 返回个人数据
 message ProfileResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  string nickname = 3;
-  string avatar = 4;
-  string mobile = 5;
-  string email = 6;
+  ProfileInfo data = 3;
 }
 
 // The profile request | 获取个人数据

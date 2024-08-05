@@ -180,10 +180,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetMethod("POST")
 
 	apis[4] = I.DB.API.Create().
-		SetPath("/api/admin/user/change-password").
+		SetPath("/api/admin/user/password").
 		SetDescription("apiDesc.userChangePassword").
 		SetAPIGroup("user").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[5] = I.DB.API.Create().
 		SetPath("/api/admin/user/info").
