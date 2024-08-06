@@ -12,6 +12,7 @@ require (
 	github.com/cloudwego/hertz v0.7.3
 	github.com/cockroachdb/errors v1.9.0
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/jwt v1.0.1
 	github.com/jinzhu/copier v0.3.5
 	github.com/mattn/go-sqlite3 v1.14.16

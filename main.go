@@ -10,9 +10,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/hertz-contrib/cors"
 	_ "github.com/mattn/go-sqlite3"
 	"hertz-admin/configs"
 	"hertz-admin/data"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
@@ -36,7 +38,17 @@ func main() {
 			app.ServeFile(ctx, "./assets/index.html")
 		},
 	})
-
+	h.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"PUT", "PATCH"},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 	register(h)
 	h.Spin()
 }

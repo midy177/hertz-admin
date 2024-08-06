@@ -32,7 +32,7 @@ type jwtLogin struct {
 	Username  string `form:"username,required" json:"username,required"`   //lint:ignore SA5008 ignoreCheck
 	Password  string `form:"password,required" json:"password,required"`   //lint:ignore SA5008 ignoreCheck
 	Captcha   string `form:"captcha,required" json:"captcha,required"`     //lint:ignore SA5008 ignoreCheck
-	CaptchaID string `form:"captchaID,required" json:"captchaId,required"` //lint:ignore SA5008 ignoreCheck
+	CaptchaID string `form:"captchaID,required" json:"captchaID,required"` //lint:ignore SA5008 ignoreCheck
 }
 
 // jwt identityKey
