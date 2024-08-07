@@ -210,7 +210,7 @@ func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jw
 			resp.StatusMsg = "success"
 			resp.Data = &admin.LoginInfo{
 				Code:      uint64(code),
-				Token:     token,
+				Token:     "Bearer " + token,
 				ExpiredAt: uint64(expire.Unix()),
 			}
 			c.JSON(code, resp)
@@ -221,7 +221,7 @@ func newJWT(config configs.Config, db *Data.Data, enforcer *casbin.Enforcer) (jw
 			resp.StatusMsg = "success"
 			resp.Data = &admin.LoginInfo{
 				Code:      uint64(code),
-				Token:     token,
+				Token:     "Bearer " + token,
 				ExpiredAt: uint64(expire.Unix()),
 			}
 			c.JSON(code, resp)
