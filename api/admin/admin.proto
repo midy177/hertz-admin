@@ -402,11 +402,11 @@ service menu {
   }
   // Update menu information | 更新菜单
   rpc UpdateMenu (CreateOrUpdateMenuReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/menu/update";
+    option (api.put) = "/api/admin/menu/update";
   }
   // Delete menu information | 删除菜单信息
   rpc DeleteMenu (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/menu";
+    option (api.delete) = "/api/admin/menu/delete";
   }
   // Get role's menu list API | 获取角色菜单列表
   rpc MenuByRole (base.Empty) returns (MenuInfoListResp) {

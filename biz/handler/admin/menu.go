@@ -13,7 +13,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"hertz-admin/api/model/admin"
-	base "hertz-admin/api/model/base"
+	"hertz-admin/api/model/base"
 )
 
 // CreateMenu .
@@ -89,7 +89,7 @@ func UpdateMenu(ctx context.Context, c *app.RequestContext) {
 }
 
 // DeleteMenu .
-// @router /api/admin/menu [DELETE]
+// @router /api/admin/menu/delete [DELETE]
 func DeleteMenu(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req base.IDReq
