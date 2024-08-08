@@ -17,7 +17,7 @@ import "base.proto";
 service admin {
   // init database
   rpc InitDatabase (base.Empty) returns (base.BaseResp) {
-    option (api.get) = "/api/initDatabase";
+    option (api.get) = "/api/init_database";
   }
   // Check the system status | 检查系统状态
   rpc HealthCheck (base.Empty) returns (base.BaseResp) {
@@ -29,11 +29,11 @@ service admin {
   }
   // DeleteStructTag | 去掉struct tag
   rpc DeleteStructTag (StructReq) returns (StructResp) {
-    option (api.post) = "/api/deleteStructTag";
+    option (api.post) = "/api/delete_struct_tag";
   }
   // StructToProto | 转换struct至proto类型数据
   rpc StructToProto (StructReq) returns (ProtoResp) {
-    option (api.post) = "/api/structToProto";
+    option (api.post) = "/api/struct_to_proto";
   }
 }
 
@@ -46,14 +46,14 @@ message StructReq {
 message StructResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  string structStr = 3;
+  string data = 3;
 }
 
 // The information of proto | proto类型数据
 message ProtoResp {
   base.StatusCode statusCode = 1;
   string statusMsg = 2;
-  string protoStr = 3;
+  string data = 3;
 }
 
 // The information of captcha | 验证码数据
@@ -109,7 +109,7 @@ service user {
   }
   // Update user's information | 更新用户
   rpc UpdateUser (CreateOrUpdateUserReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/user/update";
+    option (api.put) = "/api/admin/user/update";
   }
   // Get user basic information | 获取用户基本信息
   rpc UserInfo (base.Empty) returns (UserInfoResp) {
@@ -121,7 +121,7 @@ service user {
   }
   // Delete user information | 删除用户信息
   rpc DeleteUser (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/user";
+    option (api.delete) = "/api/admin/user/delete";
   }
   // Update user's profile | 更新用户个人信息
   rpc UpdateProfile (ProfileReq) returns (base.BaseResp) {
@@ -277,11 +277,11 @@ service apis {
   }
   // Update API information | 更新API
   rpc UpdateApi (ApiInfo) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/api/update";
+    option (api.put) = "/api/admin/api/update";
   }
   // Delete API information | 删除API信息
   rpc DeleteApi (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/api";
+    option (api.delete) = "/api/admin/api/delete";
   }
   // Get API list | 获取API列表
   rpc ApiList (ApiPageReq) returns (ApiListResp) {
@@ -331,7 +331,7 @@ service authority {
   }
   // Update API authorization information | 更新API权限
   rpc UpdateApiAuthority (CreateOrUpdateApiAuthorityReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/authority/api/update";
+    option (api.put) = "/api/admin/authority/api/update";
   }
   // Get role's API authorization list | 获取角色api权限列表
   rpc ApiAuthority (base.IDReq) returns (ApiAuthorityInfoListResp) {
@@ -343,7 +343,7 @@ service authority {
   }
   // Update menu authorization information | 更新菜单权限
   rpc UpdateMenuAuthority (MenuAuthorityInfoReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/authority/menu/update";
+    option (api.put) = "/api/admin/authority/menu/update";
   }
   // Get role's menu authorization list | 获取角色菜单权限列表
   rpc MenuAuthority (base.IDReq) returns (MenuAuthorityInfoResp) {
@@ -422,11 +422,11 @@ service menu {
   }
   // Update menu parameters | 更新菜单额外参数
   rpc UpdateMenuParam (CreateOrUpdateMenuParamReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/menu/param/update";
+    option (api.put) = "/api/admin/menu/param/update";
   }
   // Delete menu extra parameters | 删除菜单额外参数
   rpc DeleteMenuParam (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/menu/param";
+    option (api.delete) = "/api/admin/menu/param/delete";
   }
   // Get menu extra parameters by menu ID | 获取某个菜单的额外参数列表
   rpc MenuParamListByMenuID (base.IDReq) returns (MenuParamListResp) {
@@ -553,11 +553,11 @@ service role {
   }
   // Update role information | 更新角色
   rpc UpdateRole (RoleInfo) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/role/update";
+    option (api.put) = "/api/admin/role/update";
   }
   // Delete role information | 删除角色信息
   rpc DeleteRole (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/role";
+    option (api.delete) = "/api/admin/role/delete";
   }
   // Get role information | 获取角色信息
   rpc RoleByID (base.IDReq) returns (RoleInfoResp) {
@@ -619,11 +619,11 @@ message RoleListResp {
 service token {
   // Update Token information | 更新Token
   rpc UpdateToken (TokenInfo) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/token/update";
+    option (api.put) = "/api/admin/token/update";
   }
   // Delete token information | 删除token信息
   rpc DeleteToken (DeleteReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/token";
+    option (api.delete) = "/api/admin/token/delete";
   }
   // Get Token list | 获取token列表
   rpc TokenList (TokenListReq) returns (TokenListResp) {
@@ -676,11 +676,11 @@ service dictionary {
   }
   // Update dictionary information | 更新字典信息
   rpc UpdateDictionary (DictionaryInfo) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/dict/update";
+    option (api.put) = "/api/admin/dict/update";
   }
   // Delete dictionary information | 删除字典信息
   rpc DeleteDictionary (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/dict";
+    option (api.delete) = "/api/admin/dict/delete";
   }
   // Get dictionary list | 获取字典列表
   rpc DictionaryList (DictionaryPageReq) returns (DictionaryListResp) {
@@ -692,11 +692,11 @@ service dictionary {
   }
   // Update dictionary KV information | 更新字典键值信息
   rpc UpdateDictionaryDetail (DictionaryDetail) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/dict/detail/update";
+    option (api.put) = "/api/admin/dict/detail/update";
   }
   // Delete dictionary KV information | 删除字典键值信息
   rpc DeleteDictionaryDetail (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/dict/detail";
+    option (api.delete) = "/api/admin/dict/detail/delete";
   }
   // Get dictionary detail list by dictionary name | 根据字典名获取字典键值列表
   rpc DetailByDictionaryName (DictionaryDetailReq) returns (DictionaryDetailListResp) {
@@ -774,11 +774,11 @@ service oauth {
   }
   // Update Provider information | 更新提供商
   rpc UpdateProvider (ProviderInfo) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/oauth/provider/update";
+    option (api.put) = "/api/admin/oauth/provider/update";
   }
   // Delete provider information | 删除提供商信息
   rpc DeleteProvider (base.IDReq) returns (base.BaseResp) {
-    option (api.delete) = "/api/admin/oauth/provider";
+    option (api.delete) = "/api/admin/oauth/provider/delete";
   }
   // Get provider list | 获取提供商列表
   rpc GetProviderList (base.PageInfoReq) returns (ProviderListResp) {
