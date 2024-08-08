@@ -177,7 +177,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/user/update").
 		SetDescription("apiDesc.updateUser").
 		SetAPIGroup("user").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[4] = I.DB.API.Create().
 		SetPath("/api/admin/user/password").
@@ -198,7 +198,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetMethod("GET")
 
 	apis[7] = I.DB.API.Create().
-		SetPath("/api/admin/user").
+		SetPath("/api/admin/user/delete").
 		SetDescription("apiDesc.deleteUser").
 		SetAPIGroup("user").
 		SetMethod("DELETE")
@@ -219,10 +219,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/user/profile").
 		SetDescription("apiDesc.updateProfile").
 		SetAPIGroup("user").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[11] = I.DB.API.Create().
-		SetPath("/api/admin/user/logout").
+		SetPath("/api/logout").
 		SetDescription("apiDesc.logout").
 		SetAPIGroup("user").
 		SetMethod("GET")
@@ -231,7 +231,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/user/status").
 		SetDescription("apiDesc.updateUserStatus").
 		SetAPIGroup("user").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	// ROLE
 	apis[13] = I.DB.API.Create().
@@ -244,10 +244,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/role/update").
 		SetDescription("apiDesc.updateRole").
 		SetAPIGroup("role").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[15] = I.DB.API.Create().
-		SetPath("/api/admin/role").
+		SetPath("/api/admin/role/delete").
 		SetDescription("apiDesc.deleteRole").
 		SetAPIGroup("role").
 		SetMethod("DELETE")
@@ -275,10 +275,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/menu/update").
 		SetDescription("apiDesc.updateMenu").
 		SetAPIGroup("menu").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[20] = I.DB.API.Create().
-		SetPath("/api/admin/menu").
+		SetPath("/api/admin/menu/delete").
 		SetDescription("apiDesc.deleteMenu").
 		SetAPIGroup("menu").
 		SetMethod("DELETE")
@@ -305,7 +305,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/menu/param/update").
 		SetDescription("apiDesc.updateMenuParam").
 		SetAPIGroup("menu").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[25] = I.DB.API.Create().
 		SetPath("/api/admin/menu/param/list").
@@ -314,7 +314,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetMethod("GET")
 
 	apis[26] = I.DB.API.Create().
-		SetPath("/api/admin/menu/param").
+		SetPath("/api/admin/menu/param/delete").
 		SetDescription("apiDesc.deleteMenuParam").
 		SetAPIGroup("menu").
 		SetMethod("DELETE")
@@ -337,7 +337,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/authority/api/update").
 		SetDescription("apiDesc.updateApiAuthority").
 		SetAPIGroup("authority").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[30] = I.DB.API.Create().
 		SetPath("/api/admin/authority/api/role").
@@ -355,7 +355,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/authority/menu/update").
 		SetDescription("apiDesc.updateMenuAuthority").
 		SetAPIGroup("authority").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[33] = I.DB.API.Create().
 		SetPath("/api/admin/authority/menu/role").
@@ -374,10 +374,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/api/update").
 		SetDescription("apiDesc.updateApi").
 		SetAPIGroup("api").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[36] = I.DB.API.Create().
-		SetPath("/api/admin/api").
+		SetPath("/api/admin/api/delete").
 		SetDescription("apiDesc.deleteAPI").
 		SetAPIGroup("api").
 		SetMethod("DELETE")
@@ -399,16 +399,16 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/dict/update").
 		SetDescription("apiDesc.updateDictionary").
 		SetAPIGroup("dictionary").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[40] = I.DB.API.Create().
-		SetPath("/api/admin/dict").
+		SetPath("/api/admin/dict/delete").
 		SetDescription("apiDesc.deleteDictionary").
 		SetAPIGroup("dictionary").
 		SetMethod("DELETE")
 
 	apis[41] = I.DB.API.Create().
-		SetPath("/api/admin/dict/detail").
+		SetPath("/api/admin/dict/detail/delete").
 		SetDescription("apiDesc.deleteDictionaryDetail").
 		SetAPIGroup("dictionary").
 		SetMethod("DELETE")
@@ -423,7 +423,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/dict/detail/update").
 		SetDescription("apiDesc.updateDictionaryDetail").
 		SetAPIGroup("dictionary").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[44] = I.DB.API.Create().
 		SetPath("/api/admin/dict/detail/list").
@@ -448,10 +448,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/oauth/provider/update").
 		SetDescription("apiDesc.updateProvider").
 		SetAPIGroup("oauth").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[48] = I.DB.API.Create().
-		SetPath("/api/admin/oauth/provider").
+		SetPath("/api/admin/oauth/provider/delete").
 		SetDescription("apiDesc.deleteProvider").
 		SetAPIGroup("oauth").
 		SetMethod("DELETE")
@@ -463,7 +463,7 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetMethod("GET")
 
 	apis[50] = I.DB.API.Create().
-		SetPath("/api/admin/oauth/login").
+		SetPath("/api/oauth/login").
 		SetDescription("apiDesc.oauthLogin").
 		SetAPIGroup("oauth").
 		SetMethod("POST")
@@ -479,10 +479,10 @@ func (I *InitDatabase) insertApiData(ctx context.Context) error {
 		SetPath("/api/admin/token/update").
 		SetDescription("apiDesc.updateToken").
 		SetAPIGroup("token").
-		SetMethod("POST")
+		SetMethod("PUT")
 
 	apis[53] = I.DB.API.Create().
-		SetPath("/api/admin/token").
+		SetPath("/api/admin/token/delete").
 		SetDescription("apiDesc.deleteToken").
 		SetAPIGroup("token").
 		SetMethod("DELETE")

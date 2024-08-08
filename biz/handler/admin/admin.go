@@ -135,7 +135,7 @@ func DeleteStructTag(ctx context.Context, c *app.RequestContext) {
 
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
-	resp.StructStr = sBuilder.String()
+	resp.Data = sBuilder.String()
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -194,7 +194,7 @@ func StructToProto(ctx context.Context, c *app.RequestContext) {
 
 	resp.StatusCode = base.StatusCode_Success
 	resp.StatusMsg = "success"
-	resp.ProtoStr = sBuilder.String()
+	resp.Data = sBuilder.String()
 
 	c.JSON(consts.StatusOK, resp)
 }
