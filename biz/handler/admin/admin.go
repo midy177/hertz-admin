@@ -88,7 +88,7 @@ func Captcha(ctx context.Context, c *app.RequestContext) {
 }
 
 // DeleteStructTag .
-// @router /api/deleteStructTag [POST]
+// @router /api/delete_struct_tag [POST]
 func DeleteStructTag(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req admin.StructReq
@@ -141,7 +141,7 @@ func DeleteStructTag(ctx context.Context, c *app.RequestContext) {
 }
 
 // StructToProto .
-// @router /api/structToProto [POST]
+// @router /api/struct_to_proto [POST]
 func StructToProto(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req admin.StructReq
