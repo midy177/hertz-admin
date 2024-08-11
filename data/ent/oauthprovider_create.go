@@ -170,7 +170,7 @@ func (opc *OauthProviderCreate) Mutation() *OauthProviderMutation {
 // Save creates the OauthProvider in the database.
 func (opc *OauthProviderCreate) Save(ctx context.Context) (*OauthProvider, error) {
 	opc.defaults()
-	return withHooks[*OauthProvider, OauthProviderMutation](ctx, opc.sqlSave, opc.mutation, opc.hooks)
+	return withHooks(ctx, opc.sqlSave, opc.mutation, opc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -253,13 +253,7 @@ func (opc *OauthProviderCreate) sqlSave(ctx context.Context) (*OauthProvider, er
 func (opc *OauthProviderCreate) createSpec() (*OauthProvider, *sqlgraph.CreateSpec) {
 	var (
 		_node = &OauthProvider{config: opc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: oauthprovider.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: oauthprovider.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(oauthprovider.Table, sqlgraph.NewFieldSpec(oauthprovider.FieldID, field.TypeUint64))
 	)
 	if id, ok := opc.mutation.ID(); ok {
 		_node.ID = id
@@ -319,11 +313,15 @@ func (opc *OauthProviderCreate) createSpec() (*OauthProvider, *sqlgraph.CreateSp
 // OauthProviderCreateBulk is the builder for creating many OauthProvider entities in bulk.
 type OauthProviderCreateBulk struct {
 	config
+	err      error
 	builders []*OauthProviderCreate
 }
 
 // Save creates the OauthProvider entities in the database.
 func (opcb *OauthProviderCreateBulk) Save(ctx context.Context) ([]*OauthProvider, error) {
+	if opcb.err != nil {
+		return nil, opcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(opcb.builders))
 	nodes := make([]*OauthProvider, len(opcb.builders))
 	mutators := make([]Mutator, len(opcb.builders))
@@ -340,8 +338,8 @@ func (opcb *OauthProviderCreateBulk) Save(ctx context.Context) ([]*OauthProvider
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, opcb.builders[i+1].mutation)
 				} else {

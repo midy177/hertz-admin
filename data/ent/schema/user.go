@@ -35,7 +35,7 @@ func (User) Fields() []ent.Field {
 		field.String("email").Optional().Comment("email | 邮箱号"),
 		field.String("wecom").Optional().Comment("wecom | 企业微信号"),
 		field.String("avatar").
-			SchemaType(map[string]string{dialect.MySQL: "varchar(512)"}).
+			SchemaType(map[string]string{dialect.MySQL: "text"}).
 			Optional().
 			Default("").
 			Comment("avatar | 头像路径"),

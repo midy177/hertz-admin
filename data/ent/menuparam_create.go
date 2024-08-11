@@ -100,7 +100,7 @@ func (mpc *MenuParamCreate) Mutation() *MenuParamMutation {
 // Save creates the MenuParam in the database.
 func (mpc *MenuParamCreate) Save(ctx context.Context) (*MenuParam, error) {
 	mpc.defaults()
-	return withHooks[*MenuParam, MenuParamMutation](ctx, mpc.sqlSave, mpc.mutation, mpc.hooks)
+	return withHooks(ctx, mpc.sqlSave, mpc.mutation, mpc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -180,13 +180,7 @@ func (mpc *MenuParamCreate) sqlSave(ctx context.Context) (*MenuParam, error) {
 func (mpc *MenuParamCreate) createSpec() (*MenuParam, *sqlgraph.CreateSpec) {
 	var (
 		_node = &MenuParam{config: mpc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: menuparam.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: menuparam.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(menuparam.Table, sqlgraph.NewFieldSpec(menuparam.FieldID, field.TypeUint64))
 	)
 	if id, ok := mpc.mutation.ID(); ok {
 		_node.ID = id
@@ -220,10 +214,7 @@ func (mpc *MenuParamCreate) createSpec() (*MenuParam, *sqlgraph.CreateSpec) {
 			Columns: []string{menuparam.MenusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: menu.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -238,11 +229,15 @@ func (mpc *MenuParamCreate) createSpec() (*MenuParam, *sqlgraph.CreateSpec) {
 // MenuParamCreateBulk is the builder for creating many MenuParam entities in bulk.
 type MenuParamCreateBulk struct {
 	config
+	err      error
 	builders []*MenuParamCreate
 }
 
 // Save creates the MenuParam entities in the database.
 func (mpcb *MenuParamCreateBulk) Save(ctx context.Context) ([]*MenuParam, error) {
+	if mpcb.err != nil {
+		return nil, mpcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mpcb.builders))
 	nodes := make([]*MenuParam, len(mpcb.builders))
 	mutators := make([]Mutator, len(mpcb.builders))
@@ -259,8 +254,8 @@ func (mpcb *MenuParamCreateBulk) Save(ctx context.Context) ([]*MenuParam, error)
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, mpcb.builders[i+1].mutation)
 				} else {

@@ -31,17 +31,22 @@ func NewUser(data *data.Data) domain.User {
 }
 
 func (u *User) Create(ctx context.Context, req domain.CreateOrUpdateUserReq) error {
-	password, _ := encrypt.BcryptEncrypt(req.Password)
-	_, err := u.Data.DBClient.User.Create().
+	cre := u.Data.DBClient.User.Create().
 		SetAvatar(req.Avatar).
 		SetRoleID(req.RoleID).
 		SetMobile(req.Mobile).
 		SetEmail(req.Email).
 		SetStatus(uint8(req.Status)).
 		SetUsername(req.Username).
-		SetPassword(password).
-		SetNickname(req.Nickname).
-		Save(ctx)
+		SetNickname(req.Nickname)
+	if req.Password != "" {
+		password, err := encrypt.BcryptEncrypt(req.Password)
+		if err != nil {
+			return errors.Wrap(err, "encrypt password failed")
+		}
+		cre.SetPassword(password)
+	}
+	_, err := cre.Save(ctx)
 	if err != nil {
 		err = errors.Wrap(err, "create user failed")
 		return err
@@ -51,8 +56,7 @@ func (u *User) Create(ctx context.Context, req domain.CreateOrUpdateUserReq) err
 }
 
 func (u *User) Update(ctx context.Context, req domain.CreateOrUpdateUserReq) error {
-	password, _ := encrypt.BcryptEncrypt(req.Password)
-	_, err := u.Data.DBClient.User.Update().
+	upd := u.Data.DBClient.User.Update().
 		Where(user.IDEQ(req.ID)).
 		SetAvatar(req.Avatar).
 		SetRoleID(req.RoleID).
@@ -60,9 +64,16 @@ func (u *User) Update(ctx context.Context, req domain.CreateOrUpdateUserReq) err
 		SetEmail(req.Email).
 		SetStatus(uint8(req.Status)).
 		SetUsername(req.Username).
-		SetPassword(password).
-		SetNickname(req.Nickname).
-		Save(ctx)
+		SetNickname(req.Nickname)
+	if req.Password == "" {
+		password, err := encrypt.BcryptEncrypt(req.Password)
+		if err != nil {
+			return errors.Wrap(err, "encrypt password failed")
+		}
+		upd.SetPassword(password)
+	}
+
+	_, err := upd.Save(ctx)
 	if err != nil {
 		err = errors.Wrap(err, "update user failed")
 		return err
@@ -83,7 +94,10 @@ func (u *User) ChangePassword(ctx context.Context, userID uint64, oldPassword, n
 		return err
 	}
 	// update password
-	password, _ := encrypt.BcryptEncrypt(newPassword)
+	password, err := encrypt.BcryptEncrypt(newPassword)
+	if err != nil {
+		return errors.Wrap(err, "encrypt password failed")
+	}
 	_, err = u.Data.DBClient.User.Update().Where(user.IDEQ(userID)).SetPassword(password).Save(ctx)
 
 	return err
@@ -158,7 +172,10 @@ func (u *User) List(ctx context.Context, req domain.UserListReq) (userList []*do
 		err = errors.Wrap(err, "copy user info failed")
 		return userList, 0, err
 	}
-	total, _ = u.Data.DBClient.User.Query().Where(predicates...).Count(ctx)
+	total, err = u.Data.DBClient.User.Query().Where(predicates...).Count(ctx)
+	if err != nil {
+		err = errors.Wrap(err, "get user count failed")
+	}
 	return
 }
 
@@ -173,6 +190,7 @@ func (u *User) DeleteUser(ctx context.Context, id uint64) error {
 }
 
 func (u *User) UpdateProfile(ctx context.Context, req domain.UpdateUserProfileReq) error {
+	// get user info from cache
 	_, err := u.Data.DBClient.User.Update().
 		Where(user.IDEQ(req.ID)).
 		SetNickname(req.Nickname).
@@ -180,5 +198,8 @@ func (u *User) UpdateProfile(ctx context.Context, req domain.UpdateUserProfileRe
 		SetMobile(req.Mobile).
 		SetAvatar(req.Avatar).
 		Save(ctx)
+	if err == nil {
+		u.Data.Cache.Delete("userInfo" + strconv.Itoa(int(req.ID)))
+	}
 	return err
 }

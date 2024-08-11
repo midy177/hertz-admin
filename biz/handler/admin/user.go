@@ -61,7 +61,7 @@ func UserPermCode(ctx context.Context, c *app.RequestContext) {
 }
 
 // ChangePassword .
-// @router /api/admin/user/password [POST]
+// @router /api/admin/user/password [PUT]
 func ChangePassword(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req admin.ChangePasswordReq
@@ -296,7 +296,7 @@ func DeleteUser(ctx context.Context, c *app.RequestContext) {
 }
 
 // UpdateProfile .
-// @router /api/admin/user/profile [POST]
+// @router /api/admin/user/profile [PUT]
 func UpdateProfile(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req admin.ProfileReq

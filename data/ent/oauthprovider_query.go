@@ -9,6 +9,7 @@ import (
 	"hertz-admin/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -17,11 +18,8 @@ import (
 // OauthProviderQuery is the builder for querying OauthProvider entities.
 type OauthProviderQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []oauthprovider.OrderOption
 	inters     []Interceptor
 	predicates []predicate.OauthProvider
 	// intermediate query (i.e. traversal path).
@@ -37,25 +35,25 @@ func (opq *OauthProviderQuery) Where(ps ...predicate.OauthProvider) *OauthProvid
 
 // Limit the number of records to be returned by this query.
 func (opq *OauthProviderQuery) Limit(limit int) *OauthProviderQuery {
-	opq.limit = &limit
+	opq.ctx.Limit = &limit
 	return opq
 }
 
 // Offset to start from.
 func (opq *OauthProviderQuery) Offset(offset int) *OauthProviderQuery {
-	opq.offset = &offset
+	opq.ctx.Offset = &offset
 	return opq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (opq *OauthProviderQuery) Unique(unique bool) *OauthProviderQuery {
-	opq.unique = &unique
+	opq.ctx.Unique = &unique
 	return opq
 }
 
 // Order specifies how the records should be ordered.
-func (opq *OauthProviderQuery) Order(o ...OrderFunc) *OauthProviderQuery {
+func (opq *OauthProviderQuery) Order(o ...oauthprovider.OrderOption) *OauthProviderQuery {
 	opq.order = append(opq.order, o...)
 	return opq
 }
@@ -63,7 +61,7 @@ func (opq *OauthProviderQuery) Order(o ...OrderFunc) *OauthProviderQuery {
 // First returns the first OauthProvider entity from the query.
 // Returns a *NotFoundError when no OauthProvider was found.
 func (opq *OauthProviderQuery) First(ctx context.Context) (*OauthProvider, error) {
-	nodes, err := opq.Limit(1).All(newQueryContext(ctx, TypeOauthProvider, "First"))
+	nodes, err := opq.Limit(1).All(setContextOp(ctx, opq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +84,7 @@ func (opq *OauthProviderQuery) FirstX(ctx context.Context) *OauthProvider {
 // Returns a *NotFoundError when no OauthProvider ID was found.
 func (opq *OauthProviderQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = opq.Limit(1).IDs(newQueryContext(ctx, TypeOauthProvider, "FirstID")); err != nil {
+	if ids, err = opq.Limit(1).IDs(setContextOp(ctx, opq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -109,7 +107,7 @@ func (opq *OauthProviderQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one OauthProvider entity is found.
 // Returns a *NotFoundError when no OauthProvider entities are found.
 func (opq *OauthProviderQuery) Only(ctx context.Context) (*OauthProvider, error) {
-	nodes, err := opq.Limit(2).All(newQueryContext(ctx, TypeOauthProvider, "Only"))
+	nodes, err := opq.Limit(2).All(setContextOp(ctx, opq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +135,7 @@ func (opq *OauthProviderQuery) OnlyX(ctx context.Context) *OauthProvider {
 // Returns a *NotFoundError when no entities are found.
 func (opq *OauthProviderQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = opq.Limit(2).IDs(newQueryContext(ctx, TypeOauthProvider, "OnlyID")); err != nil {
+	if ids, err = opq.Limit(2).IDs(setContextOp(ctx, opq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -162,7 +160,7 @@ func (opq *OauthProviderQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of OauthProviders.
 func (opq *OauthProviderQuery) All(ctx context.Context) ([]*OauthProvider, error) {
-	ctx = newQueryContext(ctx, TypeOauthProvider, "All")
+	ctx = setContextOp(ctx, opq.ctx, ent.OpQueryAll)
 	if err := opq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -180,10 +178,12 @@ func (opq *OauthProviderQuery) AllX(ctx context.Context) []*OauthProvider {
 }
 
 // IDs executes the query and returns a list of OauthProvider IDs.
-func (opq *OauthProviderQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
-	ctx = newQueryContext(ctx, TypeOauthProvider, "IDs")
-	if err := opq.Select(oauthprovider.FieldID).Scan(ctx, &ids); err != nil {
+func (opq *OauthProviderQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if opq.ctx.Unique == nil && opq.path != nil {
+		opq.Unique(true)
+	}
+	ctx = setContextOp(ctx, opq.ctx, ent.OpQueryIDs)
+	if err = opq.Select(oauthprovider.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -200,7 +200,7 @@ func (opq *OauthProviderQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (opq *OauthProviderQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeOauthProvider, "Count")
+	ctx = setContextOp(ctx, opq.ctx, ent.OpQueryCount)
 	if err := opq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -218,7 +218,7 @@ func (opq *OauthProviderQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (opq *OauthProviderQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeOauthProvider, "Exist")
+	ctx = setContextOp(ctx, opq.ctx, ent.OpQueryExist)
 	switch _, err := opq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -246,14 +246,13 @@ func (opq *OauthProviderQuery) Clone() *OauthProviderQuery {
 	}
 	return &OauthProviderQuery{
 		config:     opq.config,
-		limit:      opq.limit,
-		offset:     opq.offset,
-		order:      append([]OrderFunc{}, opq.order...),
+		ctx:        opq.ctx.Clone(),
+		order:      append([]oauthprovider.OrderOption{}, opq.order...),
+		inters:     append([]Interceptor{}, opq.inters...),
 		predicates: append([]predicate.OauthProvider{}, opq.predicates...),
 		// clone intermediate query.
-		sql:    opq.sql.Clone(),
-		path:   opq.path,
-		unique: opq.unique,
+		sql:  opq.sql.Clone(),
+		path: opq.path,
 	}
 }
 
@@ -272,9 +271,9 @@ func (opq *OauthProviderQuery) Clone() *OauthProviderQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (opq *OauthProviderQuery) GroupBy(field string, fields ...string) *OauthProviderGroupBy {
-	opq.fields = append([]string{field}, fields...)
+	opq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &OauthProviderGroupBy{build: opq}
-	grbuild.flds = &opq.fields
+	grbuild.flds = &opq.ctx.Fields
 	grbuild.label = oauthprovider.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -293,10 +292,10 @@ func (opq *OauthProviderQuery) GroupBy(field string, fields ...string) *OauthPro
 //		Select(oauthprovider.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (opq *OauthProviderQuery) Select(fields ...string) *OauthProviderSelect {
-	opq.fields = append(opq.fields, fields...)
+	opq.ctx.Fields = append(opq.ctx.Fields, fields...)
 	sbuild := &OauthProviderSelect{OauthProviderQuery: opq}
 	sbuild.label = oauthprovider.Label
-	sbuild.flds, sbuild.scan = &opq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &opq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -316,7 +315,7 @@ func (opq *OauthProviderQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range opq.fields {
+	for _, f := range opq.ctx.Fields {
 		if !oauthprovider.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -358,30 +357,22 @@ func (opq *OauthProviderQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 
 func (opq *OauthProviderQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := opq.querySpec()
-	_spec.Node.Columns = opq.fields
-	if len(opq.fields) > 0 {
-		_spec.Unique = opq.unique != nil && *opq.unique
+	_spec.Node.Columns = opq.ctx.Fields
+	if len(opq.ctx.Fields) > 0 {
+		_spec.Unique = opq.ctx.Unique != nil && *opq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, opq.driver, _spec)
 }
 
 func (opq *OauthProviderQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   oauthprovider.Table,
-			Columns: oauthprovider.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: oauthprovider.FieldID,
-			},
-		},
-		From:   opq.sql,
-		Unique: true,
-	}
-	if unique := opq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(oauthprovider.Table, oauthprovider.Columns, sqlgraph.NewFieldSpec(oauthprovider.FieldID, field.TypeUint64))
+	_spec.From = opq.sql
+	if unique := opq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if opq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := opq.fields; len(fields) > 0 {
+	if fields := opq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, oauthprovider.FieldID)
 		for i := range fields {
@@ -397,10 +388,10 @@ func (opq *OauthProviderQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := opq.limit; limit != nil {
+	if limit := opq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := opq.offset; offset != nil {
+	if offset := opq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := opq.order; len(ps) > 0 {
@@ -416,7 +407,7 @@ func (opq *OauthProviderQuery) querySpec() *sqlgraph.QuerySpec {
 func (opq *OauthProviderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(opq.driver.Dialect())
 	t1 := builder.Table(oauthprovider.Table)
-	columns := opq.fields
+	columns := opq.ctx.Fields
 	if len(columns) == 0 {
 		columns = oauthprovider.Columns
 	}
@@ -425,7 +416,7 @@ func (opq *OauthProviderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = opq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if opq.unique != nil && *opq.unique {
+	if opq.ctx.Unique != nil && *opq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range opq.predicates {
@@ -434,12 +425,12 @@ func (opq *OauthProviderQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range opq.order {
 		p(selector)
 	}
-	if offset := opq.offset; offset != nil {
+	if offset := opq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := opq.limit; limit != nil {
+	if limit := opq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -459,7 +450,7 @@ func (opgb *OauthProviderGroupBy) Aggregate(fns ...AggregateFunc) *OauthProvider
 
 // Scan applies the selector query and scans the result into the given value.
 func (opgb *OauthProviderGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeOauthProvider, "GroupBy")
+	ctx = setContextOp(ctx, opgb.build.ctx, ent.OpQueryGroupBy)
 	if err := opgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -507,7 +498,7 @@ func (ops *OauthProviderSelect) Aggregate(fns ...AggregateFunc) *OauthProviderSe
 
 // Scan applies the selector query and scans the result into the given value.
 func (ops *OauthProviderSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeOauthProvider, "Select")
+	ctx = setContextOp(ctx, ops.ctx, ent.OpQuerySelect)
 	if err := ops.prepareQuery(ctx); err != nil {
 		return err
 	}

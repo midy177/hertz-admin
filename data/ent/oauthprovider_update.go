@@ -40,6 +40,14 @@ func (opu *OauthProviderUpdate) SetName(s string) *OauthProviderUpdate {
 	return opu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (opu *OauthProviderUpdate) SetNillableName(s *string) *OauthProviderUpdate {
+	if s != nil {
+		opu.SetName(*s)
+	}
+	return opu
+}
+
 // SetAppID sets the "app_id" field.
 func (opu *OauthProviderUpdate) SetAppID(s string) *OauthProviderUpdate {
 	opu.mutation.SetAppID(s)
@@ -63,6 +71,14 @@ func (opu *OauthProviderUpdate) ClearAppID() *OauthProviderUpdate {
 // SetClientID sets the "client_id" field.
 func (opu *OauthProviderUpdate) SetClientID(s string) *OauthProviderUpdate {
 	opu.mutation.SetClientID(s)
+	return opu
+}
+
+// SetNillableClientID sets the "client_id" field if the given value is not nil.
+func (opu *OauthProviderUpdate) SetNillableClientID(s *string) *OauthProviderUpdate {
+	if s != nil {
+		opu.SetClientID(*s)
+	}
 	return opu
 }
 
@@ -92,6 +108,14 @@ func (opu *OauthProviderUpdate) SetRedirectURL(s string) *OauthProviderUpdate {
 	return opu
 }
 
+// SetNillableRedirectURL sets the "redirect_url" field if the given value is not nil.
+func (opu *OauthProviderUpdate) SetNillableRedirectURL(s *string) *OauthProviderUpdate {
+	if s != nil {
+		opu.SetRedirectURL(*s)
+	}
+	return opu
+}
+
 // SetScopes sets the "scopes" field.
 func (opu *OauthProviderUpdate) SetScopes(s string) *OauthProviderUpdate {
 	opu.mutation.SetScopes(s)
@@ -115,6 +139,14 @@ func (opu *OauthProviderUpdate) ClearScopes() *OauthProviderUpdate {
 // SetAuthURL sets the "auth_url" field.
 func (opu *OauthProviderUpdate) SetAuthURL(s string) *OauthProviderUpdate {
 	opu.mutation.SetAuthURL(s)
+	return opu
+}
+
+// SetNillableAuthURL sets the "auth_url" field if the given value is not nil.
+func (opu *OauthProviderUpdate) SetNillableAuthURL(s *string) *OauthProviderUpdate {
+	if s != nil {
+		opu.SetAuthURL(*s)
+	}
 	return opu
 }
 
@@ -193,7 +225,7 @@ func (opu *OauthProviderUpdate) Mutation() *OauthProviderMutation {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (opu *OauthProviderUpdate) Save(ctx context.Context) (int, error) {
 	opu.defaults()
-	return withHooks[int, OauthProviderMutation](ctx, opu.sqlSave, opu.mutation, opu.hooks)
+	return withHooks(ctx, opu.sqlSave, opu.mutation, opu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -227,16 +259,7 @@ func (opu *OauthProviderUpdate) defaults() {
 }
 
 func (opu *OauthProviderUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   oauthprovider.Table,
-			Columns: oauthprovider.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: oauthprovider.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(oauthprovider.Table, oauthprovider.Columns, sqlgraph.NewFieldSpec(oauthprovider.FieldID, field.TypeUint64))
 	if ps := opu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -330,6 +353,14 @@ func (opuo *OauthProviderUpdateOne) SetName(s string) *OauthProviderUpdateOne {
 	return opuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (opuo *OauthProviderUpdateOne) SetNillableName(s *string) *OauthProviderUpdateOne {
+	if s != nil {
+		opuo.SetName(*s)
+	}
+	return opuo
+}
+
 // SetAppID sets the "app_id" field.
 func (opuo *OauthProviderUpdateOne) SetAppID(s string) *OauthProviderUpdateOne {
 	opuo.mutation.SetAppID(s)
@@ -353,6 +384,14 @@ func (opuo *OauthProviderUpdateOne) ClearAppID() *OauthProviderUpdateOne {
 // SetClientID sets the "client_id" field.
 func (opuo *OauthProviderUpdateOne) SetClientID(s string) *OauthProviderUpdateOne {
 	opuo.mutation.SetClientID(s)
+	return opuo
+}
+
+// SetNillableClientID sets the "client_id" field if the given value is not nil.
+func (opuo *OauthProviderUpdateOne) SetNillableClientID(s *string) *OauthProviderUpdateOne {
+	if s != nil {
+		opuo.SetClientID(*s)
+	}
 	return opuo
 }
 
@@ -382,6 +421,14 @@ func (opuo *OauthProviderUpdateOne) SetRedirectURL(s string) *OauthProviderUpdat
 	return opuo
 }
 
+// SetNillableRedirectURL sets the "redirect_url" field if the given value is not nil.
+func (opuo *OauthProviderUpdateOne) SetNillableRedirectURL(s *string) *OauthProviderUpdateOne {
+	if s != nil {
+		opuo.SetRedirectURL(*s)
+	}
+	return opuo
+}
+
 // SetScopes sets the "scopes" field.
 func (opuo *OauthProviderUpdateOne) SetScopes(s string) *OauthProviderUpdateOne {
 	opuo.mutation.SetScopes(s)
@@ -405,6 +452,14 @@ func (opuo *OauthProviderUpdateOne) ClearScopes() *OauthProviderUpdateOne {
 // SetAuthURL sets the "auth_url" field.
 func (opuo *OauthProviderUpdateOne) SetAuthURL(s string) *OauthProviderUpdateOne {
 	opuo.mutation.SetAuthURL(s)
+	return opuo
+}
+
+// SetNillableAuthURL sets the "auth_url" field if the given value is not nil.
+func (opuo *OauthProviderUpdateOne) SetNillableAuthURL(s *string) *OauthProviderUpdateOne {
+	if s != nil {
+		opuo.SetAuthURL(*s)
+	}
 	return opuo
 }
 
@@ -480,6 +535,12 @@ func (opuo *OauthProviderUpdateOne) Mutation() *OauthProviderMutation {
 	return opuo.mutation
 }
 
+// Where appends a list predicates to the OauthProviderUpdate builder.
+func (opuo *OauthProviderUpdateOne) Where(ps ...predicate.OauthProvider) *OauthProviderUpdateOne {
+	opuo.mutation.Where(ps...)
+	return opuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (opuo *OauthProviderUpdateOne) Select(field string, fields ...string) *OauthProviderUpdateOne {
@@ -490,7 +551,7 @@ func (opuo *OauthProviderUpdateOne) Select(field string, fields ...string) *Oaut
 // Save executes the query and returns the updated OauthProvider entity.
 func (opuo *OauthProviderUpdateOne) Save(ctx context.Context) (*OauthProvider, error) {
 	opuo.defaults()
-	return withHooks[*OauthProvider, OauthProviderMutation](ctx, opuo.sqlSave, opuo.mutation, opuo.hooks)
+	return withHooks(ctx, opuo.sqlSave, opuo.mutation, opuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -524,16 +585,7 @@ func (opuo *OauthProviderUpdateOne) defaults() {
 }
 
 func (opuo *OauthProviderUpdateOne) sqlSave(ctx context.Context) (_node *OauthProvider, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   oauthprovider.Table,
-			Columns: oauthprovider.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: oauthprovider.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(oauthprovider.Table, oauthprovider.Columns, sqlgraph.NewFieldSpec(oauthprovider.FieldID, field.TypeUint64))
 	id, ok := opuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "OauthProvider.id" for update`)}

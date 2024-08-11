@@ -68,15 +68,39 @@ func (du *DictionaryUpdate) SetTitle(s string) *DictionaryUpdate {
 	return du
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (du *DictionaryUpdate) SetNillableTitle(s *string) *DictionaryUpdate {
+	if s != nil {
+		du.SetTitle(*s)
+	}
+	return du
+}
+
 // SetName sets the "name" field.
 func (du *DictionaryUpdate) SetName(s string) *DictionaryUpdate {
 	du.mutation.SetName(s)
 	return du
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (du *DictionaryUpdate) SetNillableName(s *string) *DictionaryUpdate {
+	if s != nil {
+		du.SetName(*s)
+	}
+	return du
+}
+
 // SetDescription sets the "description" field.
 func (du *DictionaryUpdate) SetDescription(s string) *DictionaryUpdate {
 	du.mutation.SetDescription(s)
+	return du
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (du *DictionaryUpdate) SetNillableDescription(s *string) *DictionaryUpdate {
+	if s != nil {
+		du.SetDescription(*s)
+	}
 	return du
 }
 
@@ -124,7 +148,7 @@ func (du *DictionaryUpdate) RemoveDictionaryDetails(d ...*DictionaryDetail) *Dic
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (du *DictionaryUpdate) Save(ctx context.Context) (int, error) {
 	du.defaults()
-	return withHooks[int, DictionaryMutation](ctx, du.sqlSave, du.mutation, du.hooks)
+	return withHooks(ctx, du.sqlSave, du.mutation, du.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -158,16 +182,7 @@ func (du *DictionaryUpdate) defaults() {
 }
 
 func (du *DictionaryUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   dictionary.Table,
-			Columns: dictionary.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: dictionary.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(dictionary.Table, dictionary.Columns, sqlgraph.NewFieldSpec(dictionary.FieldID, field.TypeUint64))
 	if ps := du.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -204,10 +219,7 @@ func (du *DictionaryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -220,10 +232,7 @@ func (du *DictionaryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -239,10 +248,7 @@ func (du *DictionaryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -309,15 +315,39 @@ func (duo *DictionaryUpdateOne) SetTitle(s string) *DictionaryUpdateOne {
 	return duo
 }
 
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (duo *DictionaryUpdateOne) SetNillableTitle(s *string) *DictionaryUpdateOne {
+	if s != nil {
+		duo.SetTitle(*s)
+	}
+	return duo
+}
+
 // SetName sets the "name" field.
 func (duo *DictionaryUpdateOne) SetName(s string) *DictionaryUpdateOne {
 	duo.mutation.SetName(s)
 	return duo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (duo *DictionaryUpdateOne) SetNillableName(s *string) *DictionaryUpdateOne {
+	if s != nil {
+		duo.SetName(*s)
+	}
+	return duo
+}
+
 // SetDescription sets the "description" field.
 func (duo *DictionaryUpdateOne) SetDescription(s string) *DictionaryUpdateOne {
 	duo.mutation.SetDescription(s)
+	return duo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (duo *DictionaryUpdateOne) SetNillableDescription(s *string) *DictionaryUpdateOne {
+	if s != nil {
+		duo.SetDescription(*s)
+	}
 	return duo
 }
 
@@ -362,6 +392,12 @@ func (duo *DictionaryUpdateOne) RemoveDictionaryDetails(d ...*DictionaryDetail) 
 	return duo.RemoveDictionaryDetailIDs(ids...)
 }
 
+// Where appends a list predicates to the DictionaryUpdate builder.
+func (duo *DictionaryUpdateOne) Where(ps ...predicate.Dictionary) *DictionaryUpdateOne {
+	duo.mutation.Where(ps...)
+	return duo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (duo *DictionaryUpdateOne) Select(field string, fields ...string) *DictionaryUpdateOne {
@@ -372,7 +408,7 @@ func (duo *DictionaryUpdateOne) Select(field string, fields ...string) *Dictiona
 // Save executes the query and returns the updated Dictionary entity.
 func (duo *DictionaryUpdateOne) Save(ctx context.Context) (*Dictionary, error) {
 	duo.defaults()
-	return withHooks[*Dictionary, DictionaryMutation](ctx, duo.sqlSave, duo.mutation, duo.hooks)
+	return withHooks(ctx, duo.sqlSave, duo.mutation, duo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -406,16 +442,7 @@ func (duo *DictionaryUpdateOne) defaults() {
 }
 
 func (duo *DictionaryUpdateOne) sqlSave(ctx context.Context) (_node *Dictionary, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   dictionary.Table,
-			Columns: dictionary.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: dictionary.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(dictionary.Table, dictionary.Columns, sqlgraph.NewFieldSpec(dictionary.FieldID, field.TypeUint64))
 	id, ok := duo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Dictionary.id" for update`)}
@@ -469,10 +496,7 @@ func (duo *DictionaryUpdateOne) sqlSave(ctx context.Context) (_node *Dictionary,
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -485,10 +509,7 @@ func (duo *DictionaryUpdateOne) sqlSave(ctx context.Context) (_node *Dictionary,
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -504,10 +525,7 @@ func (duo *DictionaryUpdateOne) sqlSave(ctx context.Context) (_node *Dictionary,
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

@@ -27,7 +27,7 @@ func (dd *DictionaryDelete) Where(ps ...predicate.Dictionary) *DictionaryDelete 
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (dd *DictionaryDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, DictionaryMutation](ctx, dd.sqlExec, dd.mutation, dd.hooks)
+	return withHooks(ctx, dd.sqlExec, dd.mutation, dd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -40,15 +40,7 @@ func (dd *DictionaryDelete) ExecX(ctx context.Context) int {
 }
 
 func (dd *DictionaryDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: dictionary.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: dictionary.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(dictionary.Table, sqlgraph.NewFieldSpec(dictionary.FieldID, field.TypeUint64))
 	if ps := dd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type DictionaryDeleteOne struct {
 	dd *DictionaryDelete
 }
 
+// Where appends a list predicates to the DictionaryDelete builder.
+func (ddo *DictionaryDeleteOne) Where(ps ...predicate.Dictionary) *DictionaryDeleteOne {
+	ddo.dd.mutation.Where(ps...)
+	return ddo
+}
+
 // Exec executes the deletion query.
 func (ddo *DictionaryDeleteOne) Exec(ctx context.Context) error {
 	n, err := ddo.dd.Exec(ctx)
@@ -84,5 +82,7 @@ func (ddo *DictionaryDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (ddo *DictionaryDeleteOne) ExecX(ctx context.Context) {
-	ddo.dd.ExecX(ctx)
+	if err := ddo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

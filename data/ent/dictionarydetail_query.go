@@ -10,6 +10,7 @@ import (
 	"hertz-admin/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,11 +19,8 @@ import (
 // DictionaryDetailQuery is the builder for querying DictionaryDetail entities.
 type DictionaryDetailQuery struct {
 	config
-	limit          *int
-	offset         *int
-	unique         *bool
-	order          []OrderFunc
-	fields         []string
+	ctx            *QueryContext
+	order          []dictionarydetail.OrderOption
 	inters         []Interceptor
 	predicates     []predicate.DictionaryDetail
 	withDictionary *DictionaryQuery
@@ -39,25 +37,25 @@ func (ddq *DictionaryDetailQuery) Where(ps ...predicate.DictionaryDetail) *Dicti
 
 // Limit the number of records to be returned by this query.
 func (ddq *DictionaryDetailQuery) Limit(limit int) *DictionaryDetailQuery {
-	ddq.limit = &limit
+	ddq.ctx.Limit = &limit
 	return ddq
 }
 
 // Offset to start from.
 func (ddq *DictionaryDetailQuery) Offset(offset int) *DictionaryDetailQuery {
-	ddq.offset = &offset
+	ddq.ctx.Offset = &offset
 	return ddq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (ddq *DictionaryDetailQuery) Unique(unique bool) *DictionaryDetailQuery {
-	ddq.unique = &unique
+	ddq.ctx.Unique = &unique
 	return ddq
 }
 
 // Order specifies how the records should be ordered.
-func (ddq *DictionaryDetailQuery) Order(o ...OrderFunc) *DictionaryDetailQuery {
+func (ddq *DictionaryDetailQuery) Order(o ...dictionarydetail.OrderOption) *DictionaryDetailQuery {
 	ddq.order = append(ddq.order, o...)
 	return ddq
 }
@@ -87,7 +85,7 @@ func (ddq *DictionaryDetailQuery) QueryDictionary() *DictionaryQuery {
 // First returns the first DictionaryDetail entity from the query.
 // Returns a *NotFoundError when no DictionaryDetail was found.
 func (ddq *DictionaryDetailQuery) First(ctx context.Context) (*DictionaryDetail, error) {
-	nodes, err := ddq.Limit(1).All(newQueryContext(ctx, TypeDictionaryDetail, "First"))
+	nodes, err := ddq.Limit(1).All(setContextOp(ctx, ddq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +108,7 @@ func (ddq *DictionaryDetailQuery) FirstX(ctx context.Context) *DictionaryDetail 
 // Returns a *NotFoundError when no DictionaryDetail ID was found.
 func (ddq *DictionaryDetailQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = ddq.Limit(1).IDs(newQueryContext(ctx, TypeDictionaryDetail, "FirstID")); err != nil {
+	if ids, err = ddq.Limit(1).IDs(setContextOp(ctx, ddq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -133,7 +131,7 @@ func (ddq *DictionaryDetailQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one DictionaryDetail entity is found.
 // Returns a *NotFoundError when no DictionaryDetail entities are found.
 func (ddq *DictionaryDetailQuery) Only(ctx context.Context) (*DictionaryDetail, error) {
-	nodes, err := ddq.Limit(2).All(newQueryContext(ctx, TypeDictionaryDetail, "Only"))
+	nodes, err := ddq.Limit(2).All(setContextOp(ctx, ddq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +159,7 @@ func (ddq *DictionaryDetailQuery) OnlyX(ctx context.Context) *DictionaryDetail {
 // Returns a *NotFoundError when no entities are found.
 func (ddq *DictionaryDetailQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = ddq.Limit(2).IDs(newQueryContext(ctx, TypeDictionaryDetail, "OnlyID")); err != nil {
+	if ids, err = ddq.Limit(2).IDs(setContextOp(ctx, ddq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -186,7 +184,7 @@ func (ddq *DictionaryDetailQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of DictionaryDetails.
 func (ddq *DictionaryDetailQuery) All(ctx context.Context) ([]*DictionaryDetail, error) {
-	ctx = newQueryContext(ctx, TypeDictionaryDetail, "All")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryAll)
 	if err := ddq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -204,10 +202,12 @@ func (ddq *DictionaryDetailQuery) AllX(ctx context.Context) []*DictionaryDetail 
 }
 
 // IDs executes the query and returns a list of DictionaryDetail IDs.
-func (ddq *DictionaryDetailQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
-	ctx = newQueryContext(ctx, TypeDictionaryDetail, "IDs")
-	if err := ddq.Select(dictionarydetail.FieldID).Scan(ctx, &ids); err != nil {
+func (ddq *DictionaryDetailQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if ddq.ctx.Unique == nil && ddq.path != nil {
+		ddq.Unique(true)
+	}
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryIDs)
+	if err = ddq.Select(dictionarydetail.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -224,7 +224,7 @@ func (ddq *DictionaryDetailQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (ddq *DictionaryDetailQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeDictionaryDetail, "Count")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryCount)
 	if err := ddq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -242,7 +242,7 @@ func (ddq *DictionaryDetailQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (ddq *DictionaryDetailQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeDictionaryDetail, "Exist")
+	ctx = setContextOp(ctx, ddq.ctx, ent.OpQueryExist)
 	switch _, err := ddq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -270,15 +270,14 @@ func (ddq *DictionaryDetailQuery) Clone() *DictionaryDetailQuery {
 	}
 	return &DictionaryDetailQuery{
 		config:         ddq.config,
-		limit:          ddq.limit,
-		offset:         ddq.offset,
-		order:          append([]OrderFunc{}, ddq.order...),
+		ctx:            ddq.ctx.Clone(),
+		order:          append([]dictionarydetail.OrderOption{}, ddq.order...),
+		inters:         append([]Interceptor{}, ddq.inters...),
 		predicates:     append([]predicate.DictionaryDetail{}, ddq.predicates...),
 		withDictionary: ddq.withDictionary.Clone(),
 		// clone intermediate query.
-		sql:    ddq.sql.Clone(),
-		path:   ddq.path,
-		unique: ddq.unique,
+		sql:  ddq.sql.Clone(),
+		path: ddq.path,
 	}
 }
 
@@ -308,9 +307,9 @@ func (ddq *DictionaryDetailQuery) WithDictionary(opts ...func(*DictionaryQuery))
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (ddq *DictionaryDetailQuery) GroupBy(field string, fields ...string) *DictionaryDetailGroupBy {
-	ddq.fields = append([]string{field}, fields...)
+	ddq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &DictionaryDetailGroupBy{build: ddq}
-	grbuild.flds = &ddq.fields
+	grbuild.flds = &ddq.ctx.Fields
 	grbuild.label = dictionarydetail.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -329,10 +328,10 @@ func (ddq *DictionaryDetailQuery) GroupBy(field string, fields ...string) *Dicti
 //		Select(dictionarydetail.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (ddq *DictionaryDetailQuery) Select(fields ...string) *DictionaryDetailSelect {
-	ddq.fields = append(ddq.fields, fields...)
+	ddq.ctx.Fields = append(ddq.ctx.Fields, fields...)
 	sbuild := &DictionaryDetailSelect{DictionaryDetailQuery: ddq}
 	sbuild.label = dictionarydetail.Label
-	sbuild.flds, sbuild.scan = &ddq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &ddq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -352,7 +351,7 @@ func (ddq *DictionaryDetailQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range ddq.fields {
+	for _, f := range ddq.ctx.Fields {
 		if !dictionarydetail.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -412,6 +411,9 @@ func (ddq *DictionaryDetailQuery) loadDictionary(ctx context.Context, query *Dic
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(dictionary.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -431,36 +433,31 @@ func (ddq *DictionaryDetailQuery) loadDictionary(ctx context.Context, query *Dic
 
 func (ddq *DictionaryDetailQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ddq.querySpec()
-	_spec.Node.Columns = ddq.fields
-	if len(ddq.fields) > 0 {
-		_spec.Unique = ddq.unique != nil && *ddq.unique
+	_spec.Node.Columns = ddq.ctx.Fields
+	if len(ddq.ctx.Fields) > 0 {
+		_spec.Unique = ddq.ctx.Unique != nil && *ddq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, ddq.driver, _spec)
 }
 
 func (ddq *DictionaryDetailQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   dictionarydetail.Table,
-			Columns: dictionarydetail.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: dictionarydetail.FieldID,
-			},
-		},
-		From:   ddq.sql,
-		Unique: true,
-	}
-	if unique := ddq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(dictionarydetail.Table, dictionarydetail.Columns, sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64))
+	_spec.From = ddq.sql
+	if unique := ddq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if ddq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := ddq.fields; len(fields) > 0 {
+	if fields := ddq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, dictionarydetail.FieldID)
 		for i := range fields {
 			if fields[i] != dictionarydetail.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if ddq.withDictionary != nil {
+			_spec.Node.AddColumnOnce(dictionarydetail.FieldDictionaryID)
 		}
 	}
 	if ps := ddq.predicates; len(ps) > 0 {
@@ -470,10 +467,10 @@ func (ddq *DictionaryDetailQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := ddq.limit; limit != nil {
+	if limit := ddq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := ddq.offset; offset != nil {
+	if offset := ddq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := ddq.order; len(ps) > 0 {
@@ -489,7 +486,7 @@ func (ddq *DictionaryDetailQuery) querySpec() *sqlgraph.QuerySpec {
 func (ddq *DictionaryDetailQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(ddq.driver.Dialect())
 	t1 := builder.Table(dictionarydetail.Table)
-	columns := ddq.fields
+	columns := ddq.ctx.Fields
 	if len(columns) == 0 {
 		columns = dictionarydetail.Columns
 	}
@@ -498,7 +495,7 @@ func (ddq *DictionaryDetailQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = ddq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if ddq.unique != nil && *ddq.unique {
+	if ddq.ctx.Unique != nil && *ddq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range ddq.predicates {
@@ -507,12 +504,12 @@ func (ddq *DictionaryDetailQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range ddq.order {
 		p(selector)
 	}
-	if offset := ddq.offset; offset != nil {
+	if offset := ddq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := ddq.limit; limit != nil {
+	if limit := ddq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -532,7 +529,7 @@ func (ddgb *DictionaryDetailGroupBy) Aggregate(fns ...AggregateFunc) *Dictionary
 
 // Scan applies the selector query and scans the result into the given value.
 func (ddgb *DictionaryDetailGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeDictionaryDetail, "GroupBy")
+	ctx = setContextOp(ctx, ddgb.build.ctx, ent.OpQueryGroupBy)
 	if err := ddgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -580,7 +577,7 @@ func (dds *DictionaryDetailSelect) Aggregate(fns ...AggregateFunc) *DictionaryDe
 
 // Scan applies the selector query and scans the result into the given value.
 func (dds *DictionaryDetailSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeDictionaryDetail, "Select")
+	ctx = setContextOp(ctx, dds.ctx, ent.OpQuerySelect)
 	if err := dds.prepareQuery(ctx); err != nil {
 		return err
 	}

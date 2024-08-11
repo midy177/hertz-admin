@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -40,7 +41,8 @@ type OauthProvider struct {
 	// the auth style, 0: auto detect; 1: third party login; 2: login with username and password
 	AuthStyle uint64 `json:"auth_style,omitempty"`
 	// the URL to request user information by token | 用户信息请求地址
-	InfoURL string `json:"info_url,omitempty"`
+	InfoURL      string `json:"info_url,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -55,7 +57,7 @@ func (*OauthProvider) scanValues(columns []string) ([]any, error) {
 		case oauthprovider.FieldCreatedAt, oauthprovider.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type OauthProvider", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -147,16 +149,24 @@ func (op *OauthProvider) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				op.InfoURL = value.String
 			}
+		default:
+			op.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the OauthProvider.
+// This includes values selected through modifiers, order, etc.
+func (op *OauthProvider) Value(name string) (ent.Value, error) {
+	return op.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this OauthProvider.
 // Note that you need to call OauthProvider.Unwrap() before calling this method if this OauthProvider
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (op *OauthProvider) Update() *OauthProviderUpdateOne {
-	return (&OauthProviderClient{config: op.config}).UpdateOne(op)
+	return NewOauthProviderClient(op.config).UpdateOne(op)
 }
 
 // Unwrap unwraps the OauthProvider entity that was returned from a transaction after it was closed,
@@ -216,9 +226,3 @@ func (op *OauthProvider) String() string {
 
 // OauthProviders is a parsable slice of OauthProvider.
 type OauthProviders []*OauthProvider
-
-func (op OauthProviders) config(cfg config) {
-	for _i := range op {
-		op[_i].config = cfg
-	}
-}

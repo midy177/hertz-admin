@@ -110,7 +110,7 @@ func (dc *DictionaryCreate) Mutation() *DictionaryMutation {
 // Save creates the Dictionary in the database.
 func (dc *DictionaryCreate) Save(ctx context.Context) (*Dictionary, error) {
 	dc.defaults()
-	return withHooks[*Dictionary, DictionaryMutation](ctx, dc.sqlSave, dc.mutation, dc.hooks)
+	return withHooks(ctx, dc.sqlSave, dc.mutation, dc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -194,13 +194,7 @@ func (dc *DictionaryCreate) sqlSave(ctx context.Context) (*Dictionary, error) {
 func (dc *DictionaryCreate) createSpec() (*Dictionary, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Dictionary{config: dc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: dictionary.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: dictionary.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(dictionary.Table, sqlgraph.NewFieldSpec(dictionary.FieldID, field.TypeUint64))
 	)
 	if id, ok := dc.mutation.ID(); ok {
 		_node.ID = id
@@ -238,10 +232,7 @@ func (dc *DictionaryCreate) createSpec() (*Dictionary, *sqlgraph.CreateSpec) {
 			Columns: []string{dictionary.DictionaryDetailsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionarydetail.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -255,11 +246,15 @@ func (dc *DictionaryCreate) createSpec() (*Dictionary, *sqlgraph.CreateSpec) {
 // DictionaryCreateBulk is the builder for creating many Dictionary entities in bulk.
 type DictionaryCreateBulk struct {
 	config
+	err      error
 	builders []*DictionaryCreate
 }
 
 // Save creates the Dictionary entities in the database.
 func (dcb *DictionaryCreateBulk) Save(ctx context.Context) ([]*Dictionary, error) {
+	if dcb.err != nil {
+		return nil, dcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(dcb.builders))
 	nodes := make([]*Dictionary, len(dcb.builders))
 	mutators := make([]Mutator, len(dcb.builders))
@@ -276,8 +271,8 @@ func (dcb *DictionaryCreateBulk) Save(ctx context.Context) ([]*Dictionary, error
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, dcb.builders[i+1].mutation)
 				} else {

@@ -10,6 +10,7 @@ import (
 	"hertz-admin/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,11 +19,8 @@ import (
 // MenuParamQuery is the builder for querying MenuParam entities.
 type MenuParamQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []menuparam.OrderOption
 	inters     []Interceptor
 	predicates []predicate.MenuParam
 	withMenus  *MenuQuery
@@ -40,25 +38,25 @@ func (mpq *MenuParamQuery) Where(ps ...predicate.MenuParam) *MenuParamQuery {
 
 // Limit the number of records to be returned by this query.
 func (mpq *MenuParamQuery) Limit(limit int) *MenuParamQuery {
-	mpq.limit = &limit
+	mpq.ctx.Limit = &limit
 	return mpq
 }
 
 // Offset to start from.
 func (mpq *MenuParamQuery) Offset(offset int) *MenuParamQuery {
-	mpq.offset = &offset
+	mpq.ctx.Offset = &offset
 	return mpq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (mpq *MenuParamQuery) Unique(unique bool) *MenuParamQuery {
-	mpq.unique = &unique
+	mpq.ctx.Unique = &unique
 	return mpq
 }
 
 // Order specifies how the records should be ordered.
-func (mpq *MenuParamQuery) Order(o ...OrderFunc) *MenuParamQuery {
+func (mpq *MenuParamQuery) Order(o ...menuparam.OrderOption) *MenuParamQuery {
 	mpq.order = append(mpq.order, o...)
 	return mpq
 }
@@ -88,7 +86,7 @@ func (mpq *MenuParamQuery) QueryMenus() *MenuQuery {
 // First returns the first MenuParam entity from the query.
 // Returns a *NotFoundError when no MenuParam was found.
 func (mpq *MenuParamQuery) First(ctx context.Context) (*MenuParam, error) {
-	nodes, err := mpq.Limit(1).All(newQueryContext(ctx, TypeMenuParam, "First"))
+	nodes, err := mpq.Limit(1).All(setContextOp(ctx, mpq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +109,7 @@ func (mpq *MenuParamQuery) FirstX(ctx context.Context) *MenuParam {
 // Returns a *NotFoundError when no MenuParam ID was found.
 func (mpq *MenuParamQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = mpq.Limit(1).IDs(newQueryContext(ctx, TypeMenuParam, "FirstID")); err != nil {
+	if ids, err = mpq.Limit(1).IDs(setContextOp(ctx, mpq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +132,7 @@ func (mpq *MenuParamQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one MenuParam entity is found.
 // Returns a *NotFoundError when no MenuParam entities are found.
 func (mpq *MenuParamQuery) Only(ctx context.Context) (*MenuParam, error) {
-	nodes, err := mpq.Limit(2).All(newQueryContext(ctx, TypeMenuParam, "Only"))
+	nodes, err := mpq.Limit(2).All(setContextOp(ctx, mpq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +160,7 @@ func (mpq *MenuParamQuery) OnlyX(ctx context.Context) *MenuParam {
 // Returns a *NotFoundError when no entities are found.
 func (mpq *MenuParamQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = mpq.Limit(2).IDs(newQueryContext(ctx, TypeMenuParam, "OnlyID")); err != nil {
+	if ids, err = mpq.Limit(2).IDs(setContextOp(ctx, mpq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +185,7 @@ func (mpq *MenuParamQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of MenuParams.
 func (mpq *MenuParamQuery) All(ctx context.Context) ([]*MenuParam, error) {
-	ctx = newQueryContext(ctx, TypeMenuParam, "All")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryAll)
 	if err := mpq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -205,10 +203,12 @@ func (mpq *MenuParamQuery) AllX(ctx context.Context) []*MenuParam {
 }
 
 // IDs executes the query and returns a list of MenuParam IDs.
-func (mpq *MenuParamQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
-	ctx = newQueryContext(ctx, TypeMenuParam, "IDs")
-	if err := mpq.Select(menuparam.FieldID).Scan(ctx, &ids); err != nil {
+func (mpq *MenuParamQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if mpq.ctx.Unique == nil && mpq.path != nil {
+		mpq.Unique(true)
+	}
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryIDs)
+	if err = mpq.Select(menuparam.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -225,7 +225,7 @@ func (mpq *MenuParamQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (mpq *MenuParamQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeMenuParam, "Count")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryCount)
 	if err := mpq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +243,7 @@ func (mpq *MenuParamQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mpq *MenuParamQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeMenuParam, "Exist")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryExist)
 	switch _, err := mpq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,15 +271,14 @@ func (mpq *MenuParamQuery) Clone() *MenuParamQuery {
 	}
 	return &MenuParamQuery{
 		config:     mpq.config,
-		limit:      mpq.limit,
-		offset:     mpq.offset,
-		order:      append([]OrderFunc{}, mpq.order...),
+		ctx:        mpq.ctx.Clone(),
+		order:      append([]menuparam.OrderOption{}, mpq.order...),
+		inters:     append([]Interceptor{}, mpq.inters...),
 		predicates: append([]predicate.MenuParam{}, mpq.predicates...),
 		withMenus:  mpq.withMenus.Clone(),
 		// clone intermediate query.
-		sql:    mpq.sql.Clone(),
-		path:   mpq.path,
-		unique: mpq.unique,
+		sql:  mpq.sql.Clone(),
+		path: mpq.path,
 	}
 }
 
@@ -309,9 +308,9 @@ func (mpq *MenuParamQuery) WithMenus(opts ...func(*MenuQuery)) *MenuParamQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (mpq *MenuParamQuery) GroupBy(field string, fields ...string) *MenuParamGroupBy {
-	mpq.fields = append([]string{field}, fields...)
+	mpq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &MenuParamGroupBy{build: mpq}
-	grbuild.flds = &mpq.fields
+	grbuild.flds = &mpq.ctx.Fields
 	grbuild.label = menuparam.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -330,10 +329,10 @@ func (mpq *MenuParamQuery) GroupBy(field string, fields ...string) *MenuParamGro
 //		Select(menuparam.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (mpq *MenuParamQuery) Select(fields ...string) *MenuParamSelect {
-	mpq.fields = append(mpq.fields, fields...)
+	mpq.ctx.Fields = append(mpq.ctx.Fields, fields...)
 	sbuild := &MenuParamSelect{MenuParamQuery: mpq}
 	sbuild.label = menuparam.Label
-	sbuild.flds, sbuild.scan = &mpq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &mpq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -353,7 +352,7 @@ func (mpq *MenuParamQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range mpq.fields {
+	for _, f := range mpq.ctx.Fields {
 		if !menuparam.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -423,6 +422,9 @@ func (mpq *MenuParamQuery) loadMenus(ctx context.Context, query *MenuQuery, node
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(menu.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -442,30 +444,22 @@ func (mpq *MenuParamQuery) loadMenus(ctx context.Context, query *MenuQuery, node
 
 func (mpq *MenuParamQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := mpq.querySpec()
-	_spec.Node.Columns = mpq.fields
-	if len(mpq.fields) > 0 {
-		_spec.Unique = mpq.unique != nil && *mpq.unique
+	_spec.Node.Columns = mpq.ctx.Fields
+	if len(mpq.ctx.Fields) > 0 {
+		_spec.Unique = mpq.ctx.Unique != nil && *mpq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, mpq.driver, _spec)
 }
 
 func (mpq *MenuParamQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   menuparam.Table,
-			Columns: menuparam.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: menuparam.FieldID,
-			},
-		},
-		From:   mpq.sql,
-		Unique: true,
-	}
-	if unique := mpq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(menuparam.Table, menuparam.Columns, sqlgraph.NewFieldSpec(menuparam.FieldID, field.TypeUint64))
+	_spec.From = mpq.sql
+	if unique := mpq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if mpq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := mpq.fields; len(fields) > 0 {
+	if fields := mpq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, menuparam.FieldID)
 		for i := range fields {
@@ -481,10 +475,10 @@ func (mpq *MenuParamQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := mpq.limit; limit != nil {
+	if limit := mpq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := mpq.offset; offset != nil {
+	if offset := mpq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := mpq.order; len(ps) > 0 {
@@ -500,7 +494,7 @@ func (mpq *MenuParamQuery) querySpec() *sqlgraph.QuerySpec {
 func (mpq *MenuParamQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(mpq.driver.Dialect())
 	t1 := builder.Table(menuparam.Table)
-	columns := mpq.fields
+	columns := mpq.ctx.Fields
 	if len(columns) == 0 {
 		columns = menuparam.Columns
 	}
@@ -509,7 +503,7 @@ func (mpq *MenuParamQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = mpq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if mpq.unique != nil && *mpq.unique {
+	if mpq.ctx.Unique != nil && *mpq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range mpq.predicates {
@@ -518,12 +512,12 @@ func (mpq *MenuParamQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range mpq.order {
 		p(selector)
 	}
-	if offset := mpq.offset; offset != nil {
+	if offset := mpq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := mpq.limit; limit != nil {
+	if limit := mpq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -543,7 +537,7 @@ func (mpgb *MenuParamGroupBy) Aggregate(fns ...AggregateFunc) *MenuParamGroupBy 
 
 // Scan applies the selector query and scans the result into the given value.
 func (mpgb *MenuParamGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeMenuParam, "GroupBy")
+	ctx = setContextOp(ctx, mpgb.build.ctx, ent.OpQueryGroupBy)
 	if err := mpgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -591,7 +585,7 @@ func (mps *MenuParamSelect) Aggregate(fns ...AggregateFunc) *MenuParamSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (mps *MenuParamSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeMenuParam, "Select")
+	ctx = setContextOp(ctx, mps.ctx, ent.OpQuerySelect)
 	if err := mps.prepareQuery(ctx); err != nil {
 		return err
 	}

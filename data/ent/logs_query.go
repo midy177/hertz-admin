@@ -9,6 +9,7 @@ import (
 	"hertz-admin/data/ent/predicate"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -17,11 +18,8 @@ import (
 // LogsQuery is the builder for querying Logs entities.
 type LogsQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []logs.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Logs
 	// intermediate query (i.e. traversal path).
@@ -37,25 +35,25 @@ func (lq *LogsQuery) Where(ps ...predicate.Logs) *LogsQuery {
 
 // Limit the number of records to be returned by this query.
 func (lq *LogsQuery) Limit(limit int) *LogsQuery {
-	lq.limit = &limit
+	lq.ctx.Limit = &limit
 	return lq
 }
 
 // Offset to start from.
 func (lq *LogsQuery) Offset(offset int) *LogsQuery {
-	lq.offset = &offset
+	lq.ctx.Offset = &offset
 	return lq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (lq *LogsQuery) Unique(unique bool) *LogsQuery {
-	lq.unique = &unique
+	lq.ctx.Unique = &unique
 	return lq
 }
 
 // Order specifies how the records should be ordered.
-func (lq *LogsQuery) Order(o ...OrderFunc) *LogsQuery {
+func (lq *LogsQuery) Order(o ...logs.OrderOption) *LogsQuery {
 	lq.order = append(lq.order, o...)
 	return lq
 }
@@ -63,7 +61,7 @@ func (lq *LogsQuery) Order(o ...OrderFunc) *LogsQuery {
 // First returns the first Logs entity from the query.
 // Returns a *NotFoundError when no Logs was found.
 func (lq *LogsQuery) First(ctx context.Context) (*Logs, error) {
-	nodes, err := lq.Limit(1).All(newQueryContext(ctx, TypeLogs, "First"))
+	nodes, err := lq.Limit(1).All(setContextOp(ctx, lq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +84,7 @@ func (lq *LogsQuery) FirstX(ctx context.Context) *Logs {
 // Returns a *NotFoundError when no Logs ID was found.
 func (lq *LogsQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = lq.Limit(1).IDs(newQueryContext(ctx, TypeLogs, "FirstID")); err != nil {
+	if ids, err = lq.Limit(1).IDs(setContextOp(ctx, lq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -109,7 +107,7 @@ func (lq *LogsQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one Logs entity is found.
 // Returns a *NotFoundError when no Logs entities are found.
 func (lq *LogsQuery) Only(ctx context.Context) (*Logs, error) {
-	nodes, err := lq.Limit(2).All(newQueryContext(ctx, TypeLogs, "Only"))
+	nodes, err := lq.Limit(2).All(setContextOp(ctx, lq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +135,7 @@ func (lq *LogsQuery) OnlyX(ctx context.Context) *Logs {
 // Returns a *NotFoundError when no entities are found.
 func (lq *LogsQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = lq.Limit(2).IDs(newQueryContext(ctx, TypeLogs, "OnlyID")); err != nil {
+	if ids, err = lq.Limit(2).IDs(setContextOp(ctx, lq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -162,7 +160,7 @@ func (lq *LogsQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of LogsSlice.
 func (lq *LogsQuery) All(ctx context.Context) ([]*Logs, error) {
-	ctx = newQueryContext(ctx, TypeLogs, "All")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryAll)
 	if err := lq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -180,10 +178,12 @@ func (lq *LogsQuery) AllX(ctx context.Context) []*Logs {
 }
 
 // IDs executes the query and returns a list of Logs IDs.
-func (lq *LogsQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
-	ctx = newQueryContext(ctx, TypeLogs, "IDs")
-	if err := lq.Select(logs.FieldID).Scan(ctx, &ids); err != nil {
+func (lq *LogsQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if lq.ctx.Unique == nil && lq.path != nil {
+		lq.Unique(true)
+	}
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryIDs)
+	if err = lq.Select(logs.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -200,7 +200,7 @@ func (lq *LogsQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (lq *LogsQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeLogs, "Count")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryCount)
 	if err := lq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -218,7 +218,7 @@ func (lq *LogsQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (lq *LogsQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeLogs, "Exist")
+	ctx = setContextOp(ctx, lq.ctx, ent.OpQueryExist)
 	switch _, err := lq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -246,14 +246,13 @@ func (lq *LogsQuery) Clone() *LogsQuery {
 	}
 	return &LogsQuery{
 		config:     lq.config,
-		limit:      lq.limit,
-		offset:     lq.offset,
-		order:      append([]OrderFunc{}, lq.order...),
+		ctx:        lq.ctx.Clone(),
+		order:      append([]logs.OrderOption{}, lq.order...),
+		inters:     append([]Interceptor{}, lq.inters...),
 		predicates: append([]predicate.Logs{}, lq.predicates...),
 		// clone intermediate query.
-		sql:    lq.sql.Clone(),
-		path:   lq.path,
-		unique: lq.unique,
+		sql:  lq.sql.Clone(),
+		path: lq.path,
 	}
 }
 
@@ -272,9 +271,9 @@ func (lq *LogsQuery) Clone() *LogsQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (lq *LogsQuery) GroupBy(field string, fields ...string) *LogsGroupBy {
-	lq.fields = append([]string{field}, fields...)
+	lq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &LogsGroupBy{build: lq}
-	grbuild.flds = &lq.fields
+	grbuild.flds = &lq.ctx.Fields
 	grbuild.label = logs.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -293,10 +292,10 @@ func (lq *LogsQuery) GroupBy(field string, fields ...string) *LogsGroupBy {
 //		Select(logs.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (lq *LogsQuery) Select(fields ...string) *LogsSelect {
-	lq.fields = append(lq.fields, fields...)
+	lq.ctx.Fields = append(lq.ctx.Fields, fields...)
 	sbuild := &LogsSelect{LogsQuery: lq}
 	sbuild.label = logs.Label
-	sbuild.flds, sbuild.scan = &lq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &lq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -316,7 +315,7 @@ func (lq *LogsQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range lq.fields {
+	for _, f := range lq.ctx.Fields {
 		if !logs.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -358,30 +357,22 @@ func (lq *LogsQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Logs, e
 
 func (lq *LogsQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := lq.querySpec()
-	_spec.Node.Columns = lq.fields
-	if len(lq.fields) > 0 {
-		_spec.Unique = lq.unique != nil && *lq.unique
+	_spec.Node.Columns = lq.ctx.Fields
+	if len(lq.ctx.Fields) > 0 {
+		_spec.Unique = lq.ctx.Unique != nil && *lq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, lq.driver, _spec)
 }
 
 func (lq *LogsQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   logs.Table,
-			Columns: logs.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: logs.FieldID,
-			},
-		},
-		From:   lq.sql,
-		Unique: true,
-	}
-	if unique := lq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(logs.Table, logs.Columns, sqlgraph.NewFieldSpec(logs.FieldID, field.TypeUint64))
+	_spec.From = lq.sql
+	if unique := lq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if lq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := lq.fields; len(fields) > 0 {
+	if fields := lq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, logs.FieldID)
 		for i := range fields {
@@ -397,10 +388,10 @@ func (lq *LogsQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := lq.limit; limit != nil {
+	if limit := lq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := lq.offset; offset != nil {
+	if offset := lq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := lq.order; len(ps) > 0 {
@@ -416,7 +407,7 @@ func (lq *LogsQuery) querySpec() *sqlgraph.QuerySpec {
 func (lq *LogsQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(lq.driver.Dialect())
 	t1 := builder.Table(logs.Table)
-	columns := lq.fields
+	columns := lq.ctx.Fields
 	if len(columns) == 0 {
 		columns = logs.Columns
 	}
@@ -425,7 +416,7 @@ func (lq *LogsQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = lq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if lq.unique != nil && *lq.unique {
+	if lq.ctx.Unique != nil && *lq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range lq.predicates {
@@ -434,12 +425,12 @@ func (lq *LogsQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range lq.order {
 		p(selector)
 	}
-	if offset := lq.offset; offset != nil {
+	if offset := lq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := lq.limit; limit != nil {
+	if limit := lq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -459,7 +450,7 @@ func (lgb *LogsGroupBy) Aggregate(fns ...AggregateFunc) *LogsGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (lgb *LogsGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeLogs, "GroupBy")
+	ctx = setContextOp(ctx, lgb.build.ctx, ent.OpQueryGroupBy)
 	if err := lgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -507,7 +498,7 @@ func (ls *LogsSelect) Aggregate(fns ...AggregateFunc) *LogsSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ls *LogsSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeLogs, "Select")
+	ctx = setContextOp(ctx, ls.ctx, ent.OpQuerySelect)
 	if err := ls.prepareQuery(ctx); err != nil {
 		return err
 	}

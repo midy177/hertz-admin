@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -67,7 +68,8 @@ type Menu struct {
 	RealPath string `json:"real_path,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuQuery when eager-loading is set.
-	Edges MenuEdges `json:"edges"`
+	Edges        MenuEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // MenuEdges holds the relations/edges for other nodes in the graph.
@@ -97,12 +99,10 @@ func (e MenuEdges) RolesOrErr() ([]*Role, error) {
 // ParentOrErr returns the Parent value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MenuEdges) ParentOrErr() (*Menu, error) {
-	if e.loadedTypes[1] {
-		if e.Parent == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: menu.Label}
-		}
+	if e.Parent != nil {
 		return e.Parent, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: menu.Label}
 	}
 	return nil, &NotLoadedError{edge: "parent"}
 }
@@ -139,7 +139,7 @@ func (*Menu) scanValues(columns []string) ([]any, error) {
 		case menu.FieldCreatedAt, menu.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Menu", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -303,36 +303,44 @@ func (m *Menu) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.RealPath = value.String
 			}
+		default:
+			m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Menu.
+// This includes values selected through modifiers, order, etc.
+func (m *Menu) Value(name string) (ent.Value, error) {
+	return m.selectValues.Get(name)
+}
+
 // QueryRoles queries the "roles" edge of the Menu entity.
 func (m *Menu) QueryRoles() *RoleQuery {
-	return (&MenuClient{config: m.config}).QueryRoles(m)
+	return NewMenuClient(m.config).QueryRoles(m)
 }
 
 // QueryParent queries the "parent" edge of the Menu entity.
 func (m *Menu) QueryParent() *MenuQuery {
-	return (&MenuClient{config: m.config}).QueryParent(m)
+	return NewMenuClient(m.config).QueryParent(m)
 }
 
 // QueryChildren queries the "children" edge of the Menu entity.
 func (m *Menu) QueryChildren() *MenuQuery {
-	return (&MenuClient{config: m.config}).QueryChildren(m)
+	return NewMenuClient(m.config).QueryChildren(m)
 }
 
 // QueryParams queries the "params" edge of the Menu entity.
 func (m *Menu) QueryParams() *MenuParamQuery {
-	return (&MenuClient{config: m.config}).QueryParams(m)
+	return NewMenuClient(m.config).QueryParams(m)
 }
 
 // Update returns a builder for updating this Menu.
 // Note that you need to call Menu.Unwrap() before calling this method if this Menu
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (m *Menu) Update() *MenuUpdateOne {
-	return (&MenuClient{config: m.config}).UpdateOne(m)
+	return NewMenuClient(m.config).UpdateOne(m)
 }
 
 // Unwrap unwraps the Menu entity that was returned from a transaction after it was closed,
@@ -428,9 +436,3 @@ func (m *Menu) String() string {
 
 // Menus is a parsable slice of Menu.
 type Menus []*Menu
-
-func (m Menus) config(cfg config) {
-	for _i := range m {
-		m[_i].config = cfg
-	}
-}

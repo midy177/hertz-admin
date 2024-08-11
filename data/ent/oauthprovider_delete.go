@@ -27,7 +27,7 @@ func (opd *OauthProviderDelete) Where(ps ...predicate.OauthProvider) *OauthProvi
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (opd *OauthProviderDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, OauthProviderMutation](ctx, opd.sqlExec, opd.mutation, opd.hooks)
+	return withHooks(ctx, opd.sqlExec, opd.mutation, opd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -40,15 +40,7 @@ func (opd *OauthProviderDelete) ExecX(ctx context.Context) int {
 }
 
 func (opd *OauthProviderDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: oauthprovider.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: oauthprovider.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(oauthprovider.Table, sqlgraph.NewFieldSpec(oauthprovider.FieldID, field.TypeUint64))
 	if ps := opd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type OauthProviderDeleteOne struct {
 	opd *OauthProviderDelete
 }
 
+// Where appends a list predicates to the OauthProviderDelete builder.
+func (opdo *OauthProviderDeleteOne) Where(ps ...predicate.OauthProvider) *OauthProviderDeleteOne {
+	opdo.opd.mutation.Where(ps...)
+	return opdo
+}
+
 // Exec executes the deletion query.
 func (opdo *OauthProviderDeleteOne) Exec(ctx context.Context) error {
 	n, err := opdo.opd.Exec(ctx)
@@ -84,5 +82,7 @@ func (opdo *OauthProviderDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (opdo *OauthProviderDeleteOne) ExecX(ctx context.Context) {
-	opdo.opd.ExecX(ctx)
+	if err := opdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

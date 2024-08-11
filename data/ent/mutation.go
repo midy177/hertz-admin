@@ -1828,6 +1828,7 @@ func (m *DictionaryDetailMutation) ResetDictionaryID() {
 // ClearDictionary clears the "dictionary" edge to the Dictionary entity.
 func (m *DictionaryDetailMutation) ClearDictionary() {
 	m.cleareddictionary = true
+	m.clearedFields[dictionarydetail.FieldDictionaryID] = struct{}{}
 }
 
 // DictionaryCleared reports if the "dictionary" edge to the Dictionary entity was cleared.
@@ -4632,6 +4633,7 @@ func (m *MenuMutation) ResetRoles() {
 // ClearParent clears the "parent" edge to the Menu entity.
 func (m *MenuMutation) ClearParent() {
 	m.clearedparent = true
+	m.clearedFields[menu.FieldParentID] = struct{}{}
 }
 
 // ParentCleared reports if the "parent" edge to the Menu entity was cleared.

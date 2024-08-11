@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -40,7 +41,8 @@ type Logs struct {
 	// operator of log | 日志操作者
 	Operator string `json:"operator,omitempty"`
 	// time of log(millisecond) | 日志时间(毫秒)
-	Time int `json:"time,omitempty"`
+	Time         int `json:"time,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -57,7 +59,7 @@ func (*Logs) scanValues(columns []string) ([]any, error) {
 		case logs.FieldCreatedAt, logs.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Logs", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -149,16 +151,24 @@ func (l *Logs) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				l.Time = int(value.Int64)
 			}
+		default:
+			l.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Logs.
+// This includes values selected through modifiers, order, etc.
+func (l *Logs) Value(name string) (ent.Value, error) {
+	return l.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Logs.
 // Note that you need to call Logs.Unwrap() before calling this method if this Logs
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (l *Logs) Update() *LogsUpdateOne {
-	return (&LogsClient{config: l.config}).UpdateOne(l)
+	return NewLogsClient(l.config).UpdateOne(l)
 }
 
 // Unwrap unwraps the Logs entity that was returned from a transaction after it was closed,
@@ -218,9 +228,3 @@ func (l *Logs) String() string {
 
 // LogsSlice is a parsable slice of Logs.
 type LogsSlice []*Logs
-
-func (l LogsSlice) config(cfg config) {
-	for _i := range l {
-		l[_i].config = cfg
-	}
-}
