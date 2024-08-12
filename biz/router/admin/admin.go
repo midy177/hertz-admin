@@ -118,7 +118,7 @@ func Register(r *server.Hertz) {
 				_user.PUT("/password", append(_changepasswordMw(), admin.ChangePassword)...)
 				_user.GET("/perm", append(_userpermcodeMw(), admin.UserPermCode)...)
 				_user.GET("/profile", append(_userprofileMw(), admin.UserProfile)...)
-				_user.POST("/profile", append(_updateprofileMw(), admin.UpdateProfile)...)
+				_user.PUT("/profile", append(_updateprofileMw(), admin.UpdateProfile)...)
 				_user.POST("/status", append(_updateuserstatusMw(), admin.UpdateUserStatus)...)
 				_user.PUT("/update", append(_updateuserMw(), admin.UpdateUser)...)
 			}

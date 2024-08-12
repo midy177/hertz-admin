@@ -27,7 +27,7 @@ func (ad *APIDelete) Where(ps ...predicate.API) *APIDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (ad *APIDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, APIMutation](ctx, ad.sqlExec, ad.mutation, ad.hooks)
+	return withHooks(ctx, ad.sqlExec, ad.mutation, ad.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -40,15 +40,7 @@ func (ad *APIDelete) ExecX(ctx context.Context) int {
 }
 
 func (ad *APIDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: api.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: api.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(api.Table, sqlgraph.NewFieldSpec(api.FieldID, field.TypeUint64))
 	if ps := ad.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type APIDeleteOne struct {
 	ad *APIDelete
 }
 
+// Where appends a list predicates to the APIDelete builder.
+func (ado *APIDeleteOne) Where(ps ...predicate.API) *APIDeleteOne {
+	ado.ad.mutation.Where(ps...)
+	return ado
+}
+
 // Exec executes the deletion query.
 func (ado *APIDeleteOne) Exec(ctx context.Context) error {
 	n, err := ado.ad.Exec(ctx)
@@ -84,5 +82,7 @@ func (ado *APIDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (ado *APIDeleteOne) ExecX(ctx context.Context) {
-	ado.ad.ExecX(ctx)
+	if err := ado.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

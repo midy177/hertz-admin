@@ -40,15 +40,39 @@ func (au *APIUpdate) SetPath(s string) *APIUpdate {
 	return au
 }
 
+// SetNillablePath sets the "path" field if the given value is not nil.
+func (au *APIUpdate) SetNillablePath(s *string) *APIUpdate {
+	if s != nil {
+		au.SetPath(*s)
+	}
+	return au
+}
+
 // SetDescription sets the "description" field.
 func (au *APIUpdate) SetDescription(s string) *APIUpdate {
 	au.mutation.SetDescription(s)
 	return au
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (au *APIUpdate) SetNillableDescription(s *string) *APIUpdate {
+	if s != nil {
+		au.SetDescription(*s)
+	}
+	return au
+}
+
 // SetAPIGroup sets the "api_group" field.
 func (au *APIUpdate) SetAPIGroup(s string) *APIUpdate {
 	au.mutation.SetAPIGroup(s)
+	return au
+}
+
+// SetNillableAPIGroup sets the "api_group" field if the given value is not nil.
+func (au *APIUpdate) SetNillableAPIGroup(s *string) *APIUpdate {
+	if s != nil {
+		au.SetAPIGroup(*s)
+	}
 	return au
 }
 
@@ -74,7 +98,7 @@ func (au *APIUpdate) Mutation() *APIMutation {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *APIUpdate) Save(ctx context.Context) (int, error) {
 	au.defaults()
-	return withHooks[int, APIMutation](ctx, au.sqlSave, au.mutation, au.hooks)
+	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -108,16 +132,7 @@ func (au *APIUpdate) defaults() {
 }
 
 func (au *APIUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   api.Table,
-			Columns: api.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: api.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(api.Table, api.Columns, sqlgraph.NewFieldSpec(api.FieldID, field.TypeUint64))
 	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -172,15 +187,39 @@ func (auo *APIUpdateOne) SetPath(s string) *APIUpdateOne {
 	return auo
 }
 
+// SetNillablePath sets the "path" field if the given value is not nil.
+func (auo *APIUpdateOne) SetNillablePath(s *string) *APIUpdateOne {
+	if s != nil {
+		auo.SetPath(*s)
+	}
+	return auo
+}
+
 // SetDescription sets the "description" field.
 func (auo *APIUpdateOne) SetDescription(s string) *APIUpdateOne {
 	auo.mutation.SetDescription(s)
 	return auo
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (auo *APIUpdateOne) SetNillableDescription(s *string) *APIUpdateOne {
+	if s != nil {
+		auo.SetDescription(*s)
+	}
+	return auo
+}
+
 // SetAPIGroup sets the "api_group" field.
 func (auo *APIUpdateOne) SetAPIGroup(s string) *APIUpdateOne {
 	auo.mutation.SetAPIGroup(s)
+	return auo
+}
+
+// SetNillableAPIGroup sets the "api_group" field if the given value is not nil.
+func (auo *APIUpdateOne) SetNillableAPIGroup(s *string) *APIUpdateOne {
+	if s != nil {
+		auo.SetAPIGroup(*s)
+	}
 	return auo
 }
 
@@ -203,6 +242,12 @@ func (auo *APIUpdateOne) Mutation() *APIMutation {
 	return auo.mutation
 }
 
+// Where appends a list predicates to the APIUpdate builder.
+func (auo *APIUpdateOne) Where(ps ...predicate.API) *APIUpdateOne {
+	auo.mutation.Where(ps...)
+	return auo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (auo *APIUpdateOne) Select(field string, fields ...string) *APIUpdateOne {
@@ -213,7 +258,7 @@ func (auo *APIUpdateOne) Select(field string, fields ...string) *APIUpdateOne {
 // Save executes the query and returns the updated API entity.
 func (auo *APIUpdateOne) Save(ctx context.Context) (*API, error) {
 	auo.defaults()
-	return withHooks[*API, APIMutation](ctx, auo.sqlSave, auo.mutation, auo.hooks)
+	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -247,16 +292,7 @@ func (auo *APIUpdateOne) defaults() {
 }
 
 func (auo *APIUpdateOne) sqlSave(ctx context.Context) (_node *API, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   api.Table,
-			Columns: api.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: api.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(api.Table, api.Columns, sqlgraph.NewFieldSpec(api.FieldID, field.TypeUint64))
 	id, ok := auo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "API.id" for update`)}

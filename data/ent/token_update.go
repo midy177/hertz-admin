@@ -42,6 +42,14 @@ func (tu *TokenUpdate) SetUserID(u uint64) *TokenUpdate {
 	return tu
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tu *TokenUpdate) SetNillableUserID(u *uint64) *TokenUpdate {
+	if u != nil {
+		tu.SetUserID(*u)
+	}
+	return tu
+}
+
 // AddUserID adds u to the "user_id" field.
 func (tu *TokenUpdate) AddUserID(u int64) *TokenUpdate {
 	tu.mutation.AddUserID(u)
@@ -54,15 +62,39 @@ func (tu *TokenUpdate) SetToken(s string) *TokenUpdate {
 	return tu
 }
 
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (tu *TokenUpdate) SetNillableToken(s *string) *TokenUpdate {
+	if s != nil {
+		tu.SetToken(*s)
+	}
+	return tu
+}
+
 // SetSource sets the "source" field.
 func (tu *TokenUpdate) SetSource(s string) *TokenUpdate {
 	tu.mutation.SetSource(s)
 	return tu
 }
 
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (tu *TokenUpdate) SetNillableSource(s *string) *TokenUpdate {
+	if s != nil {
+		tu.SetSource(*s)
+	}
+	return tu
+}
+
 // SetExpiredAt sets the "expired_at" field.
 func (tu *TokenUpdate) SetExpiredAt(t time.Time) *TokenUpdate {
 	tu.mutation.SetExpiredAt(t)
+	return tu
+}
+
+// SetNillableExpiredAt sets the "expired_at" field if the given value is not nil.
+func (tu *TokenUpdate) SetNillableExpiredAt(t *time.Time) *TokenUpdate {
+	if t != nil {
+		tu.SetExpiredAt(*t)
+	}
 	return tu
 }
 
@@ -99,7 +131,7 @@ func (tu *TokenUpdate) ClearOwner() *TokenUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (tu *TokenUpdate) Save(ctx context.Context) (int, error) {
 	tu.defaults()
-	return withHooks[int, TokenMutation](ctx, tu.sqlSave, tu.mutation, tu.hooks)
+	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -133,16 +165,7 @@ func (tu *TokenUpdate) defaults() {
 }
 
 func (tu *TokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   token.Table,
-			Columns: token.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: token.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(token.Table, token.Columns, sqlgraph.NewFieldSpec(token.FieldID, field.TypeUint64))
 	if ps := tu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -176,10 +199,7 @@ func (tu *TokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{token.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -192,10 +212,7 @@ func (tu *TokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{token.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -236,6 +253,14 @@ func (tuo *TokenUpdateOne) SetUserID(u uint64) *TokenUpdateOne {
 	return tuo
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (tuo *TokenUpdateOne) SetNillableUserID(u *uint64) *TokenUpdateOne {
+	if u != nil {
+		tuo.SetUserID(*u)
+	}
+	return tuo
+}
+
 // AddUserID adds u to the "user_id" field.
 func (tuo *TokenUpdateOne) AddUserID(u int64) *TokenUpdateOne {
 	tuo.mutation.AddUserID(u)
@@ -248,15 +273,39 @@ func (tuo *TokenUpdateOne) SetToken(s string) *TokenUpdateOne {
 	return tuo
 }
 
+// SetNillableToken sets the "token" field if the given value is not nil.
+func (tuo *TokenUpdateOne) SetNillableToken(s *string) *TokenUpdateOne {
+	if s != nil {
+		tuo.SetToken(*s)
+	}
+	return tuo
+}
+
 // SetSource sets the "source" field.
 func (tuo *TokenUpdateOne) SetSource(s string) *TokenUpdateOne {
 	tuo.mutation.SetSource(s)
 	return tuo
 }
 
+// SetNillableSource sets the "source" field if the given value is not nil.
+func (tuo *TokenUpdateOne) SetNillableSource(s *string) *TokenUpdateOne {
+	if s != nil {
+		tuo.SetSource(*s)
+	}
+	return tuo
+}
+
 // SetExpiredAt sets the "expired_at" field.
 func (tuo *TokenUpdateOne) SetExpiredAt(t time.Time) *TokenUpdateOne {
 	tuo.mutation.SetExpiredAt(t)
+	return tuo
+}
+
+// SetNillableExpiredAt sets the "expired_at" field if the given value is not nil.
+func (tuo *TokenUpdateOne) SetNillableExpiredAt(t *time.Time) *TokenUpdateOne {
+	if t != nil {
+		tuo.SetExpiredAt(*t)
+	}
 	return tuo
 }
 
@@ -290,6 +339,12 @@ func (tuo *TokenUpdateOne) ClearOwner() *TokenUpdateOne {
 	return tuo
 }
 
+// Where appends a list predicates to the TokenUpdate builder.
+func (tuo *TokenUpdateOne) Where(ps ...predicate.Token) *TokenUpdateOne {
+	tuo.mutation.Where(ps...)
+	return tuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (tuo *TokenUpdateOne) Select(field string, fields ...string) *TokenUpdateOne {
@@ -300,7 +355,7 @@ func (tuo *TokenUpdateOne) Select(field string, fields ...string) *TokenUpdateOn
 // Save executes the query and returns the updated Token entity.
 func (tuo *TokenUpdateOne) Save(ctx context.Context) (*Token, error) {
 	tuo.defaults()
-	return withHooks[*Token, TokenMutation](ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
+	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -334,16 +389,7 @@ func (tuo *TokenUpdateOne) defaults() {
 }
 
 func (tuo *TokenUpdateOne) sqlSave(ctx context.Context) (_node *Token, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   token.Table,
-			Columns: token.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: token.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(token.Table, token.Columns, sqlgraph.NewFieldSpec(token.FieldID, field.TypeUint64))
 	id, ok := tuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Token.id" for update`)}
@@ -394,10 +440,7 @@ func (tuo *TokenUpdateOne) sqlSave(ctx context.Context) (_node *Token, err error
 			Columns: []string{token.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -410,10 +453,7 @@ func (tuo *TokenUpdateOne) sqlSave(ctx context.Context) (_node *Token, err error
 			Columns: []string{token.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

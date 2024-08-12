@@ -27,7 +27,7 @@ func (md *MenuDelete) Where(ps ...predicate.Menu) *MenuDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (md *MenuDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, MenuMutation](ctx, md.sqlExec, md.mutation, md.hooks)
+	return withHooks(ctx, md.sqlExec, md.mutation, md.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -40,15 +40,7 @@ func (md *MenuDelete) ExecX(ctx context.Context) int {
 }
 
 func (md *MenuDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: menu.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: menu.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(menu.Table, sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64))
 	if ps := md.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type MenuDeleteOne struct {
 	md *MenuDelete
 }
 
+// Where appends a list predicates to the MenuDelete builder.
+func (mdo *MenuDeleteOne) Where(ps ...predicate.Menu) *MenuDeleteOne {
+	mdo.md.mutation.Where(ps...)
+	return mdo
+}
+
 // Exec executes the deletion query.
 func (mdo *MenuDeleteOne) Exec(ctx context.Context) error {
 	n, err := mdo.md.Exec(ctx)
@@ -84,5 +82,7 @@ func (mdo *MenuDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (mdo *MenuDeleteOne) ExecX(ctx context.Context) {
-	mdo.md.ExecX(ctx)
+	if err := mdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

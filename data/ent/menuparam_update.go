@@ -41,15 +41,39 @@ func (mpu *MenuParamUpdate) SetType(s string) *MenuParamUpdate {
 	return mpu
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (mpu *MenuParamUpdate) SetNillableType(s *string) *MenuParamUpdate {
+	if s != nil {
+		mpu.SetType(*s)
+	}
+	return mpu
+}
+
 // SetKey sets the "key" field.
 func (mpu *MenuParamUpdate) SetKey(s string) *MenuParamUpdate {
 	mpu.mutation.SetKey(s)
 	return mpu
 }
 
+// SetNillableKey sets the "key" field if the given value is not nil.
+func (mpu *MenuParamUpdate) SetNillableKey(s *string) *MenuParamUpdate {
+	if s != nil {
+		mpu.SetKey(*s)
+	}
+	return mpu
+}
+
 // SetValue sets the "value" field.
 func (mpu *MenuParamUpdate) SetValue(s string) *MenuParamUpdate {
 	mpu.mutation.SetValue(s)
+	return mpu
+}
+
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (mpu *MenuParamUpdate) SetNillableValue(s *string) *MenuParamUpdate {
+	if s != nil {
+		mpu.SetValue(*s)
+	}
 	return mpu
 }
 
@@ -86,7 +110,7 @@ func (mpu *MenuParamUpdate) ClearMenus() *MenuParamUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (mpu *MenuParamUpdate) Save(ctx context.Context) (int, error) {
 	mpu.defaults()
-	return withHooks[int, MenuParamMutation](ctx, mpu.sqlSave, mpu.mutation, mpu.hooks)
+	return withHooks(ctx, mpu.sqlSave, mpu.mutation, mpu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -120,16 +144,7 @@ func (mpu *MenuParamUpdate) defaults() {
 }
 
 func (mpu *MenuParamUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   menuparam.Table,
-			Columns: menuparam.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: menuparam.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(menuparam.Table, menuparam.Columns, sqlgraph.NewFieldSpec(menuparam.FieldID, field.TypeUint64))
 	if ps := mpu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -157,10 +172,7 @@ func (mpu *MenuParamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{menuparam.MenusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: menu.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -173,10 +185,7 @@ func (mpu *MenuParamUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{menuparam.MenusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: menu.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -216,15 +225,39 @@ func (mpuo *MenuParamUpdateOne) SetType(s string) *MenuParamUpdateOne {
 	return mpuo
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (mpuo *MenuParamUpdateOne) SetNillableType(s *string) *MenuParamUpdateOne {
+	if s != nil {
+		mpuo.SetType(*s)
+	}
+	return mpuo
+}
+
 // SetKey sets the "key" field.
 func (mpuo *MenuParamUpdateOne) SetKey(s string) *MenuParamUpdateOne {
 	mpuo.mutation.SetKey(s)
 	return mpuo
 }
 
+// SetNillableKey sets the "key" field if the given value is not nil.
+func (mpuo *MenuParamUpdateOne) SetNillableKey(s *string) *MenuParamUpdateOne {
+	if s != nil {
+		mpuo.SetKey(*s)
+	}
+	return mpuo
+}
+
 // SetValue sets the "value" field.
 func (mpuo *MenuParamUpdateOne) SetValue(s string) *MenuParamUpdateOne {
 	mpuo.mutation.SetValue(s)
+	return mpuo
+}
+
+// SetNillableValue sets the "value" field if the given value is not nil.
+func (mpuo *MenuParamUpdateOne) SetNillableValue(s *string) *MenuParamUpdateOne {
+	if s != nil {
+		mpuo.SetValue(*s)
+	}
 	return mpuo
 }
 
@@ -258,6 +291,12 @@ func (mpuo *MenuParamUpdateOne) ClearMenus() *MenuParamUpdateOne {
 	return mpuo
 }
 
+// Where appends a list predicates to the MenuParamUpdate builder.
+func (mpuo *MenuParamUpdateOne) Where(ps ...predicate.MenuParam) *MenuParamUpdateOne {
+	mpuo.mutation.Where(ps...)
+	return mpuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (mpuo *MenuParamUpdateOne) Select(field string, fields ...string) *MenuParamUpdateOne {
@@ -268,7 +307,7 @@ func (mpuo *MenuParamUpdateOne) Select(field string, fields ...string) *MenuPara
 // Save executes the query and returns the updated MenuParam entity.
 func (mpuo *MenuParamUpdateOne) Save(ctx context.Context) (*MenuParam, error) {
 	mpuo.defaults()
-	return withHooks[*MenuParam, MenuParamMutation](ctx, mpuo.sqlSave, mpuo.mutation, mpuo.hooks)
+	return withHooks(ctx, mpuo.sqlSave, mpuo.mutation, mpuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -302,16 +341,7 @@ func (mpuo *MenuParamUpdateOne) defaults() {
 }
 
 func (mpuo *MenuParamUpdateOne) sqlSave(ctx context.Context) (_node *MenuParam, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   menuparam.Table,
-			Columns: menuparam.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: menuparam.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(menuparam.Table, menuparam.Columns, sqlgraph.NewFieldSpec(menuparam.FieldID, field.TypeUint64))
 	id, ok := mpuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MenuParam.id" for update`)}
@@ -356,10 +386,7 @@ func (mpuo *MenuParamUpdateOne) sqlSave(ctx context.Context) (_node *MenuParam, 
 			Columns: []string{menuparam.MenusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: menu.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -372,10 +399,7 @@ func (mpuo *MenuParamUpdateOne) sqlSave(ctx context.Context) (_node *MenuParam, 
 			Columns: []string{menuparam.MenusColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: menu.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(menu.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

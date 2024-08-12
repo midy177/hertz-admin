@@ -94,7 +94,7 @@ func (ac *APICreate) Mutation() *APIMutation {
 // Save creates the API in the database.
 func (ac *APICreate) Save(ctx context.Context) (*API, error) {
 	ac.defaults()
-	return withHooks[*API, APIMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -181,13 +181,7 @@ func (ac *APICreate) sqlSave(ctx context.Context) (*API, error) {
 func (ac *APICreate) createSpec() (*API, *sqlgraph.CreateSpec) {
 	var (
 		_node = &API{config: ac.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: api.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: api.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(api.Table, sqlgraph.NewFieldSpec(api.FieldID, field.TypeUint64))
 	)
 	if id, ok := ac.mutation.ID(); ok {
 		_node.ID = id
@@ -223,11 +217,15 @@ func (ac *APICreate) createSpec() (*API, *sqlgraph.CreateSpec) {
 // APICreateBulk is the builder for creating many API entities in bulk.
 type APICreateBulk struct {
 	config
+	err      error
 	builders []*APICreate
 }
 
 // Save creates the API entities in the database.
 func (acb *APICreateBulk) Save(ctx context.Context) ([]*API, error) {
+	if acb.err != nil {
+		return nil, acb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
 	nodes := make([]*API, len(acb.builders))
 	mutators := make([]Mutator, len(acb.builders))
@@ -244,8 +242,8 @@ func (acb *APICreateBulk) Save(ctx context.Context) ([]*API, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
 				} else {

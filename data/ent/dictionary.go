@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -31,7 +32,8 @@ type Dictionary struct {
 	Description string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DictionaryQuery when eager-loading is set.
-	Edges DictionaryEdges `json:"edges"`
+	Edges        DictionaryEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // DictionaryEdges holds the relations/edges for other nodes in the graph.
@@ -64,7 +66,7 @@ func (*Dictionary) scanValues(columns []string) ([]any, error) {
 		case dictionary.FieldCreatedAt, dictionary.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Dictionary", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -120,21 +122,29 @@ func (d *Dictionary) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				d.Description = value.String
 			}
+		default:
+			d.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Dictionary.
+// This includes values selected through modifiers, order, etc.
+func (d *Dictionary) Value(name string) (ent.Value, error) {
+	return d.selectValues.Get(name)
+}
+
 // QueryDictionaryDetails queries the "dictionary_details" edge of the Dictionary entity.
 func (d *Dictionary) QueryDictionaryDetails() *DictionaryDetailQuery {
-	return (&DictionaryClient{config: d.config}).QueryDictionaryDetails(d)
+	return NewDictionaryClient(d.config).QueryDictionaryDetails(d)
 }
 
 // Update returns a builder for updating this Dictionary.
 // Note that you need to call Dictionary.Unwrap() before calling this method if this Dictionary
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (d *Dictionary) Update() *DictionaryUpdateOne {
-	return (&DictionaryClient{config: d.config}).UpdateOne(d)
+	return NewDictionaryClient(d.config).UpdateOne(d)
 }
 
 // Unwrap unwraps the Dictionary entity that was returned from a transaction after it was closed,
@@ -176,9 +186,3 @@ func (d *Dictionary) String() string {
 
 // Dictionaries is a parsable slice of Dictionary.
 type Dictionaries []*Dictionary
-
-func (d Dictionaries) config(cfg config) {
-	for _i := range d {
-		d[_i].config = cfg
-	}
-}

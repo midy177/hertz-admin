@@ -170,7 +170,7 @@ func (lc *LogsCreate) Mutation() *LogsMutation {
 // Save creates the Logs in the database.
 func (lc *LogsCreate) Save(ctx context.Context) (*Logs, error) {
 	lc.defaults()
-	return withHooks[*Logs, LogsMutation](ctx, lc.sqlSave, lc.mutation, lc.hooks)
+	return withHooks(ctx, lc.sqlSave, lc.mutation, lc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -253,13 +253,7 @@ func (lc *LogsCreate) sqlSave(ctx context.Context) (*Logs, error) {
 func (lc *LogsCreate) createSpec() (*Logs, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Logs{config: lc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: logs.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: logs.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(logs.Table, sqlgraph.NewFieldSpec(logs.FieldID, field.TypeUint64))
 	)
 	if id, ok := lc.mutation.ID(); ok {
 		_node.ID = id
@@ -319,11 +313,15 @@ func (lc *LogsCreate) createSpec() (*Logs, *sqlgraph.CreateSpec) {
 // LogsCreateBulk is the builder for creating many Logs entities in bulk.
 type LogsCreateBulk struct {
 	config
+	err      error
 	builders []*LogsCreate
 }
 
 // Save creates the Logs entities in the database.
 func (lcb *LogsCreateBulk) Save(ctx context.Context) ([]*Logs, error) {
+	if lcb.err != nil {
+		return nil, lcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(lcb.builders))
 	nodes := make([]*Logs, len(lcb.builders))
 	mutators := make([]Mutator, len(lcb.builders))
@@ -340,8 +338,8 @@ func (lcb *LogsCreateBulk) Save(ctx context.Context) ([]*Logs, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, lcb.builders[i+1].mutation)
 				} else {

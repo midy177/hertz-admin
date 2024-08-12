@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -34,7 +35,8 @@ type DictionaryDetail struct {
 	DictionaryID uint64 `json:"dictionary_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DictionaryDetailQuery when eager-loading is set.
-	Edges DictionaryDetailEdges `json:"edges"`
+	Edges        DictionaryDetailEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // DictionaryDetailEdges holds the relations/edges for other nodes in the graph.
@@ -49,12 +51,10 @@ type DictionaryDetailEdges struct {
 // DictionaryOrErr returns the Dictionary value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e DictionaryDetailEdges) DictionaryOrErr() (*Dictionary, error) {
-	if e.loadedTypes[0] {
-		if e.Dictionary == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: dictionary.Label}
-		}
+	if e.Dictionary != nil {
 		return e.Dictionary, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: dictionary.Label}
 	}
 	return nil, &NotLoadedError{edge: "dictionary"}
 }
@@ -71,7 +71,7 @@ func (*DictionaryDetail) scanValues(columns []string) ([]any, error) {
 		case dictionarydetail.FieldCreatedAt, dictionarydetail.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type DictionaryDetail", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -133,21 +133,29 @@ func (dd *DictionaryDetail) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				dd.DictionaryID = uint64(value.Int64)
 			}
+		default:
+			dd.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// GetValue returns the ent.Value that was dynamically selected and assigned to the DictionaryDetail.
+// This includes values selected through modifiers, order, etc.
+func (dd *DictionaryDetail) GetValue(name string) (ent.Value, error) {
+	return dd.selectValues.Get(name)
+}
+
 // QueryDictionary queries the "dictionary" edge of the DictionaryDetail entity.
 func (dd *DictionaryDetail) QueryDictionary() *DictionaryQuery {
-	return (&DictionaryDetailClient{config: dd.config}).QueryDictionary(dd)
+	return NewDictionaryDetailClient(dd.config).QueryDictionary(dd)
 }
 
 // Update returns a builder for updating this DictionaryDetail.
 // Note that you need to call DictionaryDetail.Unwrap() before calling this method if this DictionaryDetail
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (dd *DictionaryDetail) Update() *DictionaryDetailUpdateOne {
-	return (&DictionaryDetailClient{config: dd.config}).UpdateOne(dd)
+	return NewDictionaryDetailClient(dd.config).UpdateOne(dd)
 }
 
 // Unwrap unwraps the DictionaryDetail entity that was returned from a transaction after it was closed,
@@ -192,9 +200,3 @@ func (dd *DictionaryDetail) String() string {
 
 // DictionaryDetails is a parsable slice of DictionaryDetail.
 type DictionaryDetails []*DictionaryDetail
-
-func (dd DictionaryDetails) config(cfg config) {
-	for _i := range dd {
-		dd[_i].config = cfg
-	}
-}

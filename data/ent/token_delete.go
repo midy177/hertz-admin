@@ -27,7 +27,7 @@ func (td *TokenDelete) Where(ps ...predicate.Token) *TokenDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (td *TokenDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, TokenMutation](ctx, td.sqlExec, td.mutation, td.hooks)
+	return withHooks(ctx, td.sqlExec, td.mutation, td.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
@@ -40,15 +40,7 @@ func (td *TokenDelete) ExecX(ctx context.Context) int {
 }
 
 func (td *TokenDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := &sqlgraph.DeleteSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table: token.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: token.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewDeleteSpec(token.Table, sqlgraph.NewFieldSpec(token.FieldID, field.TypeUint64))
 	if ps := td.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -69,6 +61,12 @@ type TokenDeleteOne struct {
 	td *TokenDelete
 }
 
+// Where appends a list predicates to the TokenDelete builder.
+func (tdo *TokenDeleteOne) Where(ps ...predicate.Token) *TokenDeleteOne {
+	tdo.td.mutation.Where(ps...)
+	return tdo
+}
+
 // Exec executes the deletion query.
 func (tdo *TokenDeleteOne) Exec(ctx context.Context) error {
 	n, err := tdo.td.Exec(ctx)
@@ -84,5 +82,7 @@ func (tdo *TokenDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (tdo *TokenDeleteOne) ExecX(ctx context.Context) {
-	tdo.td.ExecX(ctx)
+	if err := tdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

@@ -125,7 +125,7 @@ service user {
   }
   // Update user's profile | 更新用户个人信息
   rpc UpdateProfile (ProfileReq) returns (base.BaseResp) {
-    option (api.post) = "/api/admin/user/profile";
+    option (api.put) = "/api/admin/user/profile";
   }
   // Get user's profile | 获取用户个人信息
   rpc UserProfile (base.Empty) returns (ProfileResp) {

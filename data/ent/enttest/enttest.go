@@ -4,6 +4,7 @@ package enttest
 
 import (
 	"context"
+
 	"hertz-admin/data/ent"
 	// required by schema hooks.
 	_ "hertz-admin/data/ent/runtime"

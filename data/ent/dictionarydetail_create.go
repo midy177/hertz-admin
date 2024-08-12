@@ -114,7 +114,7 @@ func (ddc *DictionaryDetailCreate) Mutation() *DictionaryDetailMutation {
 // Save creates the DictionaryDetail in the database.
 func (ddc *DictionaryDetailCreate) Save(ctx context.Context) (*DictionaryDetail, error) {
 	ddc.defaults()
-	return withHooks[*DictionaryDetail, DictionaryDetailMutation](ctx, ddc.sqlSave, ddc.mutation, ddc.hooks)
+	return withHooks(ctx, ddc.sqlSave, ddc.mutation, ddc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -198,13 +198,7 @@ func (ddc *DictionaryDetailCreate) sqlSave(ctx context.Context) (*DictionaryDeta
 func (ddc *DictionaryDetailCreate) createSpec() (*DictionaryDetail, *sqlgraph.CreateSpec) {
 	var (
 		_node = &DictionaryDetail{config: ddc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: dictionarydetail.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: dictionarydetail.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(dictionarydetail.Table, sqlgraph.NewFieldSpec(dictionarydetail.FieldID, field.TypeUint64))
 	)
 	if id, ok := ddc.mutation.ID(); ok {
 		_node.ID = id
@@ -242,10 +236,7 @@ func (ddc *DictionaryDetailCreate) createSpec() (*DictionaryDetail, *sqlgraph.Cr
 			Columns: []string{dictionarydetail.DictionaryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: dictionary.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(dictionary.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -260,11 +251,15 @@ func (ddc *DictionaryDetailCreate) createSpec() (*DictionaryDetail, *sqlgraph.Cr
 // DictionaryDetailCreateBulk is the builder for creating many DictionaryDetail entities in bulk.
 type DictionaryDetailCreateBulk struct {
 	config
+	err      error
 	builders []*DictionaryDetailCreate
 }
 
 // Save creates the DictionaryDetail entities in the database.
 func (ddcb *DictionaryDetailCreateBulk) Save(ctx context.Context) ([]*DictionaryDetail, error) {
+	if ddcb.err != nil {
+		return nil, ddcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ddcb.builders))
 	nodes := make([]*DictionaryDetail, len(ddcb.builders))
 	mutators := make([]Mutator, len(ddcb.builders))
@@ -281,8 +276,8 @@ func (ddcb *DictionaryDetailCreateBulk) Save(ctx context.Context) ([]*Dictionary
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ddcb.builders[i+1].mutation)
 				} else {

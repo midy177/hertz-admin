@@ -369,11 +369,7 @@ func HasMenus() predicate.MenuParam {
 // HasMenusWith applies the HasEdge predicate on the "menus" edge with a given conditions (other predicates).
 func HasMenusWith(preds ...predicate.Menu) predicate.MenuParam {
 	return predicate.MenuParam(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(MenusInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, MenusTable, MenusColumn),
-		)
+		step := newMenusStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -384,32 +380,15 @@ func HasMenusWith(preds ...predicate.Menu) predicate.MenuParam {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.MenuParam) predicate.MenuParam {
-	return predicate.MenuParam(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MenuParam(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.MenuParam) predicate.MenuParam {
-	return predicate.MenuParam(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MenuParam(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.MenuParam) predicate.MenuParam {
-	return predicate.MenuParam(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.MenuParam(sql.NotPredicates(p))
 }

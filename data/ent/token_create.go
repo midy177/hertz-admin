@@ -106,7 +106,7 @@ func (tc *TokenCreate) Mutation() *TokenMutation {
 // Save creates the Token in the database.
 func (tc *TokenCreate) Save(ctx context.Context) (*Token, error) {
 	tc.defaults()
-	return withHooks[*Token, TokenMutation](ctx, tc.sqlSave, tc.mutation, tc.hooks)
+	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -189,13 +189,7 @@ func (tc *TokenCreate) sqlSave(ctx context.Context) (*Token, error) {
 func (tc *TokenCreate) createSpec() (*Token, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Token{config: tc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: token.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: token.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(token.Table, sqlgraph.NewFieldSpec(token.FieldID, field.TypeUint64))
 	)
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
@@ -233,10 +227,7 @@ func (tc *TokenCreate) createSpec() (*Token, *sqlgraph.CreateSpec) {
 			Columns: []string{token.OwnerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: user.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -251,11 +242,15 @@ func (tc *TokenCreate) createSpec() (*Token, *sqlgraph.CreateSpec) {
 // TokenCreateBulk is the builder for creating many Token entities in bulk.
 type TokenCreateBulk struct {
 	config
+	err      error
 	builders []*TokenCreate
 }
 
 // Save creates the Token entities in the database.
 func (tcb *TokenCreateBulk) Save(ctx context.Context) ([]*Token, error) {
+	if tcb.err != nil {
+		return nil, tcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(tcb.builders))
 	nodes := make([]*Token, len(tcb.builders))
 	mutators := make([]Mutator, len(tcb.builders))
@@ -272,8 +267,8 @@ func (tcb *TokenCreateBulk) Save(ctx context.Context) ([]*Token, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, tcb.builders[i+1].mutation)
 				} else {

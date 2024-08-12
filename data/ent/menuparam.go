@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -30,8 +31,9 @@ type MenuParam struct {
 	Value string `json:"value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MenuParamQuery when eager-loading is set.
-	Edges       MenuParamEdges `json:"edges"`
-	menu_params *uint64
+	Edges        MenuParamEdges `json:"edges"`
+	menu_params  *uint64
+	selectValues sql.SelectValues
 }
 
 // MenuParamEdges holds the relations/edges for other nodes in the graph.
@@ -46,12 +48,10 @@ type MenuParamEdges struct {
 // MenusOrErr returns the Menus value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MenuParamEdges) MenusOrErr() (*Menu, error) {
-	if e.loadedTypes[0] {
-		if e.Menus == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: menu.Label}
-		}
+	if e.Menus != nil {
 		return e.Menus, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: menu.Label}
 	}
 	return nil, &NotLoadedError{edge: "menus"}
 }
@@ -70,7 +70,7 @@ func (*MenuParam) scanValues(columns []string) ([]any, error) {
 		case menuparam.ForeignKeys[0]: // menu_params
 			values[i] = new(sql.NullInt64)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type MenuParam", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -127,21 +127,29 @@ func (mp *MenuParam) assignValues(columns []string, values []any) error {
 				mp.menu_params = new(uint64)
 				*mp.menu_params = uint64(value.Int64)
 			}
+		default:
+			mp.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// GetValue returns the ent.Value that was dynamically selected and assigned to the MenuParam.
+// This includes values selected through modifiers, order, etc.
+func (mp *MenuParam) GetValue(name string) (ent.Value, error) {
+	return mp.selectValues.Get(name)
+}
+
 // QueryMenus queries the "menus" edge of the MenuParam entity.
 func (mp *MenuParam) QueryMenus() *MenuQuery {
-	return (&MenuParamClient{config: mp.config}).QueryMenus(mp)
+	return NewMenuParamClient(mp.config).QueryMenus(mp)
 }
 
 // Update returns a builder for updating this MenuParam.
 // Note that you need to call MenuParam.Unwrap() before calling this method if this MenuParam
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (mp *MenuParam) Update() *MenuParamUpdateOne {
-	return (&MenuParamClient{config: mp.config}).UpdateOne(mp)
+	return NewMenuParamClient(mp.config).UpdateOne(mp)
 }
 
 // Unwrap unwraps the MenuParam entity that was returned from a transaction after it was closed,
@@ -180,9 +188,3 @@ func (mp *MenuParam) String() string {
 
 // MenuParams is a parsable slice of MenuParam.
 type MenuParams []*MenuParam
-
-func (mp MenuParams) config(cfg config) {
-	for _i := range mp {
-		mp[_i].config = cfg
-	}
-}

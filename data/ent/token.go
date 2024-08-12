@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -31,8 +32,9 @@ type Token struct {
 	ExpiredAt time.Time `json:"expired_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TokenQuery when eager-loading is set.
-	Edges      TokenEdges `json:"edges"`
-	user_token *uint64
+	Edges        TokenEdges `json:"edges"`
+	user_token   *uint64
+	selectValues sql.SelectValues
 }
 
 // TokenEdges holds the relations/edges for other nodes in the graph.
@@ -47,12 +49,10 @@ type TokenEdges struct {
 // OwnerOrErr returns the Owner value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e TokenEdges) OwnerOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.Owner == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.Owner != nil {
 		return e.Owner, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "owner"}
 }
@@ -71,7 +71,7 @@ func (*Token) scanValues(columns []string) ([]any, error) {
 		case token.ForeignKeys[0]: // user_token
 			values[i] = new(sql.NullInt64)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Token", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -134,21 +134,29 @@ func (t *Token) assignValues(columns []string, values []any) error {
 				t.user_token = new(uint64)
 				*t.user_token = uint64(value.Int64)
 			}
+		default:
+			t.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
+// Value returns the ent.Value that was dynamically selected and assigned to the Token.
+// This includes values selected through modifiers, order, etc.
+func (t *Token) Value(name string) (ent.Value, error) {
+	return t.selectValues.Get(name)
+}
+
 // QueryOwner queries the "owner" edge of the Token entity.
 func (t *Token) QueryOwner() *UserQuery {
-	return (&TokenClient{config: t.config}).QueryOwner(t)
+	return NewTokenClient(t.config).QueryOwner(t)
 }
 
 // Update returns a builder for updating this Token.
 // Note that you need to call Token.Unwrap() before calling this method if this Token
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (t *Token) Update() *TokenUpdateOne {
-	return (&TokenClient{config: t.config}).UpdateOne(t)
+	return NewTokenClient(t.config).UpdateOne(t)
 }
 
 // Unwrap unwraps the Token entity that was returned from a transaction after it was closed,
@@ -190,9 +198,3 @@ func (t *Token) String() string {
 
 // Tokens is a parsable slice of Token.
 type Tokens []*Token
-
-func (t Tokens) config(cfg config) {
-	for _i := range t {
-		t[_i].config = cfg
-	}
-}

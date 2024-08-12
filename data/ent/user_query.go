@@ -11,6 +11,7 @@ import (
 	"hertz-admin/data/ent/user"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -19,11 +20,8 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
+	ctx        *QueryContext
+	order      []user.OrderOption
 	inters     []Interceptor
 	predicates []predicate.User
 	withToken  *TokenQuery
@@ -40,25 +38,25 @@ func (uq *UserQuery) Where(ps ...predicate.User) *UserQuery {
 
 // Limit the number of records to be returned by this query.
 func (uq *UserQuery) Limit(limit int) *UserQuery {
-	uq.limit = &limit
+	uq.ctx.Limit = &limit
 	return uq
 }
 
 // Offset to start from.
 func (uq *UserQuery) Offset(offset int) *UserQuery {
-	uq.offset = &offset
+	uq.ctx.Offset = &offset
 	return uq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (uq *UserQuery) Unique(unique bool) *UserQuery {
-	uq.unique = &unique
+	uq.ctx.Unique = &unique
 	return uq
 }
 
 // Order specifies how the records should be ordered.
-func (uq *UserQuery) Order(o ...OrderFunc) *UserQuery {
+func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	uq.order = append(uq.order, o...)
 	return uq
 }
@@ -88,7 +86,7 @@ func (uq *UserQuery) QueryToken() *TokenQuery {
 // First returns the first User entity from the query.
 // Returns a *NotFoundError when no User was found.
 func (uq *UserQuery) First(ctx context.Context) (*User, error) {
-	nodes, err := uq.Limit(1).All(newQueryContext(ctx, TypeUser, "First"))
+	nodes, err := uq.Limit(1).All(setContextOp(ctx, uq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +109,7 @@ func (uq *UserQuery) FirstX(ctx context.Context) *User {
 // Returns a *NotFoundError when no User ID was found.
 func (uq *UserQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = uq.Limit(1).IDs(newQueryContext(ctx, TypeUser, "FirstID")); err != nil {
+	if ids, err = uq.Limit(1).IDs(setContextOp(ctx, uq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +132,7 @@ func (uq *UserQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one User entity is found.
 // Returns a *NotFoundError when no User entities are found.
 func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
-	nodes, err := uq.Limit(2).All(newQueryContext(ctx, TypeUser, "Only"))
+	nodes, err := uq.Limit(2).All(setContextOp(ctx, uq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +160,7 @@ func (uq *UserQuery) OnlyX(ctx context.Context) *User {
 // Returns a *NotFoundError when no entities are found.
 func (uq *UserQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = uq.Limit(2).IDs(newQueryContext(ctx, TypeUser, "OnlyID")); err != nil {
+	if ids, err = uq.Limit(2).IDs(setContextOp(ctx, uq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +185,7 @@ func (uq *UserQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of Users.
 func (uq *UserQuery) All(ctx context.Context) ([]*User, error) {
-	ctx = newQueryContext(ctx, TypeUser, "All")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryAll)
 	if err := uq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -205,10 +203,12 @@ func (uq *UserQuery) AllX(ctx context.Context) []*User {
 }
 
 // IDs executes the query and returns a list of User IDs.
-func (uq *UserQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
-	ctx = newQueryContext(ctx, TypeUser, "IDs")
-	if err := uq.Select(user.FieldID).Scan(ctx, &ids); err != nil {
+func (uq *UserQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if uq.ctx.Unique == nil && uq.path != nil {
+		uq.Unique(true)
+	}
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryIDs)
+	if err = uq.Select(user.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -225,7 +225,7 @@ func (uq *UserQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (uq *UserQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeUser, "Count")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryCount)
 	if err := uq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +243,7 @@ func (uq *UserQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (uq *UserQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeUser, "Exist")
+	ctx = setContextOp(ctx, uq.ctx, ent.OpQueryExist)
 	switch _, err := uq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,15 +271,14 @@ func (uq *UserQuery) Clone() *UserQuery {
 	}
 	return &UserQuery{
 		config:     uq.config,
-		limit:      uq.limit,
-		offset:     uq.offset,
-		order:      append([]OrderFunc{}, uq.order...),
+		ctx:        uq.ctx.Clone(),
+		order:      append([]user.OrderOption{}, uq.order...),
+		inters:     append([]Interceptor{}, uq.inters...),
 		predicates: append([]predicate.User{}, uq.predicates...),
 		withToken:  uq.withToken.Clone(),
 		// clone intermediate query.
-		sql:    uq.sql.Clone(),
-		path:   uq.path,
-		unique: uq.unique,
+		sql:  uq.sql.Clone(),
+		path: uq.path,
 	}
 }
 
@@ -309,9 +308,9 @@ func (uq *UserQuery) WithToken(opts ...func(*TokenQuery)) *UserQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
-	uq.fields = append([]string{field}, fields...)
+	uq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &UserGroupBy{build: uq}
-	grbuild.flds = &uq.fields
+	grbuild.flds = &uq.ctx.Fields
 	grbuild.label = user.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -330,10 +329,10 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 //		Select(user.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (uq *UserQuery) Select(fields ...string) *UserSelect {
-	uq.fields = append(uq.fields, fields...)
+	uq.ctx.Fields = append(uq.ctx.Fields, fields...)
 	sbuild := &UserSelect{UserQuery: uq}
 	sbuild.label = user.Label
-	sbuild.flds, sbuild.scan = &uq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &uq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -353,7 +352,7 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range uq.fields {
+	for _, f := range uq.ctx.Fields {
 		if !user.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -412,7 +411,7 @@ func (uq *UserQuery) loadToken(ctx context.Context, query *TokenQuery, nodes []*
 	}
 	query.withFKs = true
 	query.Where(predicate.Token(func(s *sql.Selector) {
-		s.Where(sql.InValues(user.TokenColumn, fks...))
+		s.Where(sql.InValues(s.C(user.TokenColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -425,7 +424,7 @@ func (uq *UserQuery) loadToken(ctx context.Context, query *TokenQuery, nodes []*
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_token" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_token" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -434,30 +433,22 @@ func (uq *UserQuery) loadToken(ctx context.Context, query *TokenQuery, nodes []*
 
 func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := uq.querySpec()
-	_spec.Node.Columns = uq.fields
-	if len(uq.fields) > 0 {
-		_spec.Unique = uq.unique != nil && *uq.unique
+	_spec.Node.Columns = uq.ctx.Fields
+	if len(uq.ctx.Fields) > 0 {
+		_spec.Unique = uq.ctx.Unique != nil && *uq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, uq.driver, _spec)
 }
 
 func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   user.Table,
-			Columns: user.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: user.FieldID,
-			},
-		},
-		From:   uq.sql,
-		Unique: true,
-	}
-	if unique := uq.unique; unique != nil {
+	_spec := sqlgraph.NewQuerySpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeUint64))
+	_spec.From = uq.sql
+	if unique := uq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if uq.path != nil {
+		_spec.Unique = true
 	}
-	if fields := uq.fields; len(fields) > 0 {
+	if fields := uq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, user.FieldID)
 		for i := range fields {
@@ -473,10 +464,10 @@ func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := uq.limit; limit != nil {
+	if limit := uq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := uq.offset; offset != nil {
+	if offset := uq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := uq.order; len(ps) > 0 {
@@ -492,7 +483,7 @@ func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
 func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(uq.driver.Dialect())
 	t1 := builder.Table(user.Table)
-	columns := uq.fields
+	columns := uq.ctx.Fields
 	if len(columns) == 0 {
 		columns = user.Columns
 	}
@@ -501,7 +492,7 @@ func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = uq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if uq.unique != nil && *uq.unique {
+	if uq.ctx.Unique != nil && *uq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, p := range uq.predicates {
@@ -510,12 +501,12 @@ func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range uq.order {
 		p(selector)
 	}
-	if offset := uq.offset; offset != nil {
+	if offset := uq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := uq.limit; limit != nil {
+	if limit := uq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -535,7 +526,7 @@ func (ugb *UserGroupBy) Aggregate(fns ...AggregateFunc) *UserGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ugb *UserGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeUser, "GroupBy")
+	ctx = setContextOp(ctx, ugb.build.ctx, ent.OpQueryGroupBy)
 	if err := ugb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -583,7 +574,7 @@ func (us *UserSelect) Aggregate(fns ...AggregateFunc) *UserSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (us *UserSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeUser, "Select")
+	ctx = setContextOp(ctx, us.ctx, ent.OpQuerySelect)
 	if err := us.prepareQuery(ctx); err != nil {
 		return err
 	}

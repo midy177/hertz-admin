@@ -40,9 +40,25 @@ func (lu *LogsUpdate) SetType(s string) *LogsUpdate {
 	return lu
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (lu *LogsUpdate) SetNillableType(s *string) *LogsUpdate {
+	if s != nil {
+		lu.SetType(*s)
+	}
+	return lu
+}
+
 // SetMethod sets the "method" field.
 func (lu *LogsUpdate) SetMethod(s string) *LogsUpdate {
 	lu.mutation.SetMethod(s)
+	return lu
+}
+
+// SetNillableMethod sets the "method" field if the given value is not nil.
+func (lu *LogsUpdate) SetNillableMethod(s *string) *LogsUpdate {
+	if s != nil {
+		lu.SetMethod(*s)
+	}
 	return lu
 }
 
@@ -52,9 +68,25 @@ func (lu *LogsUpdate) SetAPI(s string) *LogsUpdate {
 	return lu
 }
 
+// SetNillableAPI sets the "api" field if the given value is not nil.
+func (lu *LogsUpdate) SetNillableAPI(s *string) *LogsUpdate {
+	if s != nil {
+		lu.SetAPI(*s)
+	}
+	return lu
+}
+
 // SetSuccess sets the "success" field.
 func (lu *LogsUpdate) SetSuccess(b bool) *LogsUpdate {
 	lu.mutation.SetSuccess(b)
+	return lu
+}
+
+// SetNillableSuccess sets the "success" field if the given value is not nil.
+func (lu *LogsUpdate) SetNillableSuccess(b *bool) *LogsUpdate {
+	if b != nil {
+		lu.SetSuccess(*b)
+	}
 	return lu
 }
 
@@ -193,7 +225,7 @@ func (lu *LogsUpdate) Mutation() *LogsMutation {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (lu *LogsUpdate) Save(ctx context.Context) (int, error) {
 	lu.defaults()
-	return withHooks[int, LogsMutation](ctx, lu.sqlSave, lu.mutation, lu.hooks)
+	return withHooks(ctx, lu.sqlSave, lu.mutation, lu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -227,16 +259,7 @@ func (lu *LogsUpdate) defaults() {
 }
 
 func (lu *LogsUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   logs.Table,
-			Columns: logs.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: logs.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(logs.Table, logs.Columns, sqlgraph.NewFieldSpec(logs.FieldID, field.TypeUint64))
 	if ps := lu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -330,9 +353,25 @@ func (luo *LogsUpdateOne) SetType(s string) *LogsUpdateOne {
 	return luo
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (luo *LogsUpdateOne) SetNillableType(s *string) *LogsUpdateOne {
+	if s != nil {
+		luo.SetType(*s)
+	}
+	return luo
+}
+
 // SetMethod sets the "method" field.
 func (luo *LogsUpdateOne) SetMethod(s string) *LogsUpdateOne {
 	luo.mutation.SetMethod(s)
+	return luo
+}
+
+// SetNillableMethod sets the "method" field if the given value is not nil.
+func (luo *LogsUpdateOne) SetNillableMethod(s *string) *LogsUpdateOne {
+	if s != nil {
+		luo.SetMethod(*s)
+	}
 	return luo
 }
 
@@ -342,9 +381,25 @@ func (luo *LogsUpdateOne) SetAPI(s string) *LogsUpdateOne {
 	return luo
 }
 
+// SetNillableAPI sets the "api" field if the given value is not nil.
+func (luo *LogsUpdateOne) SetNillableAPI(s *string) *LogsUpdateOne {
+	if s != nil {
+		luo.SetAPI(*s)
+	}
+	return luo
+}
+
 // SetSuccess sets the "success" field.
 func (luo *LogsUpdateOne) SetSuccess(b bool) *LogsUpdateOne {
 	luo.mutation.SetSuccess(b)
+	return luo
+}
+
+// SetNillableSuccess sets the "success" field if the given value is not nil.
+func (luo *LogsUpdateOne) SetNillableSuccess(b *bool) *LogsUpdateOne {
+	if b != nil {
+		luo.SetSuccess(*b)
+	}
 	return luo
 }
 
@@ -480,6 +535,12 @@ func (luo *LogsUpdateOne) Mutation() *LogsMutation {
 	return luo.mutation
 }
 
+// Where appends a list predicates to the LogsUpdate builder.
+func (luo *LogsUpdateOne) Where(ps ...predicate.Logs) *LogsUpdateOne {
+	luo.mutation.Where(ps...)
+	return luo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (luo *LogsUpdateOne) Select(field string, fields ...string) *LogsUpdateOne {
@@ -490,7 +551,7 @@ func (luo *LogsUpdateOne) Select(field string, fields ...string) *LogsUpdateOne 
 // Save executes the query and returns the updated Logs entity.
 func (luo *LogsUpdateOne) Save(ctx context.Context) (*Logs, error) {
 	luo.defaults()
-	return withHooks[*Logs, LogsMutation](ctx, luo.sqlSave, luo.mutation, luo.hooks)
+	return withHooks(ctx, luo.sqlSave, luo.mutation, luo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -524,16 +585,7 @@ func (luo *LogsUpdateOne) defaults() {
 }
 
 func (luo *LogsUpdateOne) sqlSave(ctx context.Context) (_node *Logs, err error) {
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   logs.Table,
-			Columns: logs.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: logs.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(logs.Table, logs.Columns, sqlgraph.NewFieldSpec(logs.FieldID, field.TypeUint64))
 	id, ok := luo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Logs.id" for update`)}
