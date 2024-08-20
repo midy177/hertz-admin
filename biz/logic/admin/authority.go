@@ -30,8 +30,14 @@ func NewAuthority(data *data.Data, cbs *casbin.Enforcer) domain.Authority {
 
 func (a *Authority) UpdateApiAuthority(ctx context.Context, roleIDStr string, infos []*domain.ApiAuthorityInfo) error {
 	// clear old policies
-	var oldPolicies [][]string
-	oldPolicies = a.Cbs.GetFilteredPolicy(0, roleIDStr)
+	var (
+		oldPolicies [][]string
+		err         error
+	)
+	oldPolicies, err = a.Cbs.GetFilteredPolicy(0, roleIDStr)
+	if err != nil {
+		return err
+	}
 	if len(oldPolicies) != 0 {
 		removeResult, err := a.Cbs.RemoveFilteredPolicy(0, roleIDStr)
 		if err != nil {
@@ -58,7 +64,7 @@ func (a *Authority) UpdateApiAuthority(ctx context.Context, roleIDStr string, in
 
 // ApiAuthority Get Api authority policy by role id
 func (a *Authority) ApiAuthority(ctx context.Context, roleIDStr string) (infos []*domain.ApiAuthorityInfo, err error) {
-	policies := a.Cbs.GetFilteredPolicy(0, roleIDStr)
+	policies, _ := a.Cbs.GetFilteredPolicy(0, roleIDStr)
 	for _, v := range policies {
 		infos = append(infos, &domain.ApiAuthorityInfo{
 			Path:   v[1],
